@@ -1,11 +1,13 @@
 import React from 'react';
 import { ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Camera } from 'expo-camera';
-import * as FileSystem from 'expo-file-system';
 import * as Permissions from 'expo-permissions';
 import * as ImageManipulator from "expo-image-manipulator";
 import Layout from '../constants/Layout';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import getEnvVars from '../environment';
+
+const { apiUrl } = getEnvVars();
 
 const flashModeOrder = {
   off: 'on',
@@ -103,7 +105,7 @@ export default class CameraScreen extends React.Component {
       "inputs": {"image_bytes": [this.base64WebSafe(base64).split(',').pop()]},
     });
 
-    let response = await fetch("http://localhost:5000/predict", {
+    let response = await fetch(`${apiUrl}/predict`, {
       method: "POST",
       headers: {
         'Accept': 'application/json',
@@ -130,7 +132,7 @@ export default class CameraScreen extends React.Component {
       },
     });
 
-    let response = await fetch("http://localhost:5000/predict", {
+    let response = await fetch(`${apiUrl}/predict`, {
       method: "POST",
       headers: {
         'Accept': 'application/json',
