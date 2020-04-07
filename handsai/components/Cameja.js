@@ -68,9 +68,6 @@ export default class CameraScreen extends React.Component {
   componentDidMount = async () => {
     const {status} = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({permissionsGranted: status === 'granted'});
-    FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'photos').catch(e => {
-      console.log(e, 'Directory exists');
-    });
   };
 
   toggleFacing = () => this.setState({type: this.state.type === 'back' ? 'front' : 'back'});

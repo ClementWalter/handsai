@@ -1,6 +1,6 @@
 import os
 import requests
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, send_from_directory, Response
 from flask_cors import CORS
 
 
@@ -20,9 +20,15 @@ def index(path):
 
 @app.route("/status")
 def status():
-    return requests.get("http://serving:8501/v1/models/siamese_nets_classifier").content
+    response = requests.get("http://serving:8501/v1/models/siamese_nets_classifier")
+    return Response(response.text, status=response.status_code, content_type=response.headers["content-type"])
 
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    return requests.post("http://serving:8501/v1/models/siamese_nets_classifier:predict", json=request.json).content
+    response = requests.post("http://serving:8501/v1/models/siamese_nets_classifier:predict", json=request.json)
+    return Response(response.text, status=response.status_code, content_type=response.headers["content-type"])
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0")
