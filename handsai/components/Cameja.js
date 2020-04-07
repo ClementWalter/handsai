@@ -106,9 +106,8 @@ export default class CameraScreen extends React.Component {
       "inputs": {"image_bytes": [this.base64WebSafe(base64).split(',').pop()]},
     });
 
-    let response = await fetch("https://handsai.herokuapp.com/v1/models/siamese_nets_classifier:predict", {
+    let response = await fetch("http://localhost:5000/predict", {
       method: "POST",
-      mode: 'no-cors',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -134,9 +133,8 @@ export default class CameraScreen extends React.Component {
       },
     });
 
-    let response = await fetch("https://handsai.herokuapp.com/v1/models/siamese_nets_classifier:predict", {
+    let response = await fetch("http://localhost:5000/predict", {
       method: "POST",
-      mode: 'no-cors',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',

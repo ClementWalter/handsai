@@ -1,3 +1,6 @@
+[tool.black]
+line-length = 120
+
 [tool.poetry]
 name = "handsai"
 version = "0.1.0"
@@ -7,8 +10,13 @@ authors = ["Clément Walter <clementw@sicara.com>"]
 [tool.poetry.dependencies]
 python = "^3.6"
 tensorflow = "^2.1.0"
+flask = "^1.1.2"
+flask-cors = "^3.0.8"
+grpcio = "^1.28.1"
+gunicorn = "^20.0.4"
 
 [tool.poetry.dev-dependencies]
+black = "^19.10b0"
 
 [build-system]
 requires = ["poetry>=0.12"]
