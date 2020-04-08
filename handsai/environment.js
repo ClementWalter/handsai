@@ -1,5 +1,3 @@
-import Constants from "expo-constants";
-
 const ENV = {
  dev: {
    apiUrl: "http://localhost:5000",
