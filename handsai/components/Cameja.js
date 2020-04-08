@@ -101,7 +101,7 @@ export default class CameraScreen extends React.Component {
 
   predict = async (base64) => {
     let body = JSON.stringify({
-      "signature_name": "from_crop",
+      "signature_name": "decode_and_serve",
       "inputs": {"image_bytes": [this.base64WebSafe(base64).split(',').pop()]},
     });
 
