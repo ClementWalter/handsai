@@ -4,7 +4,7 @@ import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
 import * as ImageManipulator from "expo-image-manipulator";
 import Layout from '../constants/Layout';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import getEnvVars from '../environment';
 
 const { apiUrl } = getEnvVars();
@@ -80,9 +80,19 @@ export default class CameraScreen extends React.Component {
 
   toggleFocus = () => this.setState({autoFocus: this.state.autoFocus === 'on' ? 'off' : 'on'});
 
-  takePicture = () => {
+  takePicture = async () => {
     if (this.camera) {
-      this.camera.takePictureAsync({quality: 0, onPictureSaved: this.onPictureSaved});
+      const photo = await this.camera.takePictureAsync({quality: 0});
+      console.log("photo", photo);
+      this.setState({photo, predictionStatus: "WAITING"});
+      const photoLow = await this.resize(photo);
+      console.log("photoLow", photoLow);
+      const prediction = await this.predict(photoLow.base64);
+      console.log("prediction", prediction);
+      const scores = prediction["outputs"]["scores"][0];
+      const labels = prediction["outputs"]["classes"];
+      let predictedLabel = labels.length > 0 ? labels[scores.indexOf(Math.max(...scores))] : "NO_LABEL";
+      this.setState({prediction, photo, photoLow, predictionStatus: "OK", predictedLabel});
     }
   };
 
@@ -90,7 +100,7 @@ export default class CameraScreen extends React.Component {
 
   resize = async (photo) => {
     const resize = photo.width < photo.height ? {height: 224} : {width: 224};
-    return await ImageManipulator.manipulateAsync(
+    return ImageManipulator.manipulateAsync(
       photo.uri,
       [{resize}],
       {compress: 0.1, format: ImageManipulator.SaveFormat.JPEG, base64: true},
@@ -105,16 +115,20 @@ export default class CameraScreen extends React.Component {
       "inputs": {"image_bytes": [this.base64WebSafe(base64).split(',').pop()]},
     });
 
-    let response = await fetch(`${apiUrl}/predict`, {
-      method: "POST",
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body,
-    });
-    if (response.ok) {
-      return await response.json()
+    try {
+      let response = await fetch(`${apiUrl}/predict`, {
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body,
+      });
+      if (response.ok) {
+        return await response.json()
+      }
+    } catch (e) {
+      console.log(e)
     }
     return responseStub
   };
@@ -143,19 +157,8 @@ export default class CameraScreen extends React.Component {
     if (response.ok) {
       const response_body = await response.json();
       console.log("catalog loss", response_body["outputs"][0]);
-      this.setState({support_set_loss: response_body["outputs"][0], overwrite: false})
+      this.setState({support_set_loss: response_body["outputs"][0], overwrite: false, predictedLabel: null})
     }
-  };
-
-  onPictureSaved = async photo => {
-    const photoLow = await this.resize(photo);
-    const prediction = await this.predict(photoLow.base64);
-    console.log("prediction", await prediction);
-    const scores = prediction["outputs"]["scores"][0];
-    const labels = prediction["outputs"]["classes"];
-    let predictedLabel = labels.length > 0 ? labels[scores.indexOf(Math.max(...scores))] : "NO_LABEL";
-    this.setState({prediction, photoLow, photo, predictionStatus: "OK", predictedLabel});
-
   };
 
   renderNoPermissions = () =>
@@ -182,13 +185,31 @@ export default class CameraScreen extends React.Component {
       </TouchableOpacity>
     </View>;
 
-  renderBottomBar = (onPress) =>
+  renderCameraBottomBar = () =>
     <View style={styles.bottomBar}>
       <TouchableOpacity
-        onPress={onPress}
+        onPress={this.takePicture}
         style={{alignSelf: 'center'}}
       >
         <Ionicons name="ios-radio-button-on" size={70} color="white"/>
+      </TouchableOpacity>
+    </View>;
+
+  handleLabelReject = () => this.labelInput.focus();
+
+  renderPredictionBottomBar = () =>
+    <View style={styles.bottomBar}>
+      <TouchableOpacity
+        onPress={this.handleLabelReject}
+        style={{alignSelf: 'center'}}
+      >
+        <FontAwesome name="times-circle" size={60} style={styles.labelKo}/>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={this.sendPredictionFeedback}
+        style={{alignSelf: 'center'}}
+      >
+        <FontAwesome name="check-circle" size={60} style={styles.labelOk}/>
       </TouchableOpacity>
     </View>;
 
@@ -212,9 +233,10 @@ export default class CameraScreen extends React.Component {
               textAlign: 'center',
               color: 'black',
             }}
+            ref={(ref) => {this.labelInput = ref}}
           />
         </View>
-        {this.renderBottomBar(this.sendPredictionFeedback)}
+        {this.renderPredictionBottomBar()}
       </ImageBackground>
     </View>;
 
@@ -237,7 +259,7 @@ export default class CameraScreen extends React.Component {
           onMountError={this.handleMountError}
         >
           {this.renderTopBar()}
-          {this.renderBottomBar(this.takePicture)}
+          {this.renderCameraBottomBar()}
         </Camera>
       </View>
     );
@@ -279,8 +301,9 @@ const styles = StyleSheet.create({
   },
   bottomBar: {
     backgroundColor: 'transparent',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     flex: 0.15,
+    flexDirection: 'row',
   },
   noPermissions: {
     flex: 1,
@@ -302,4 +325,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
+  labelOk: {color: "rgb(84,255,34)"},
+  labelKo: {color: "#c3483c"},
 });
