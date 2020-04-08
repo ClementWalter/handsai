@@ -20,13 +20,13 @@ def index(path):
 
 @app.route("/status")
 def status():
-    response = requests.get("http://serving:8501/v1/models/siamese_nets_classifier")
+    response = requests.get("http://handsai-serving/v1/models/siamese_nets_classifier")
     return Response(response.text, status=response.status_code, content_type=response.headers["content-type"])
 
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    response = requests.post("http://serving:8501/v1/models/siamese_nets_classifier:predict", json=request.json)
+    response = requests.post("http://handsai-serving/v1/models/siamese_nets_classifier:predict", json=request.json)
     return Response(response.text, status=response.status_code, content_type=response.headers["content-type"])
 
 
