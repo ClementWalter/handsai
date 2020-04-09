@@ -6,8 +6,9 @@ import * as ImageManipulator from "expo-image-manipulator";
 import Layout from '../constants/Layout';
 import { Ionicons, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import getEnvVars from '../environment';
+import ProgressBarAnimated from 'react-native-progress-bar-animated';
 
-const { apiUrl } = getEnvVars();
+const {apiUrl} = getEnvVars();
 
 const flashModeOrder = {
   off: 'on',
@@ -83,16 +84,15 @@ export default class CameraScreen extends React.Component {
   takePicture = async () => {
     if (this.camera) {
       const photo = await this.camera.takePictureAsync({quality: 0});
-      console.log("photo", photo);
       this.setState({photo, predictionStatus: "WAITING"});
       const photoLow = await this.resize(photo);
-      console.log("photoLow", photoLow);
       const prediction = await this.predict(photoLow.base64);
       console.log("prediction", prediction);
       const scores = prediction["outputs"]["scores"][0];
       const labels = prediction["outputs"]["classes"];
-      let predictedLabel = labels.length > 0 ? labels[scores.indexOf(Math.max(...scores))] : "NO_LABEL";
-      this.setState({prediction, photo, photoLow, predictionStatus: "OK", predictedLabel});
+      const confidence = Math.max(...scores);
+      const predictedLabel = labels.length > 0 ? labels[scores.indexOf(confidence)] : "NO_LABEL";
+      this.setState({prediction, confidence, photo, photoLow, predictionStatus: "OK", predictedLabel});
     }
   };
 
@@ -213,30 +213,53 @@ export default class CameraScreen extends React.Component {
       </TouchableOpacity>
     </View>;
 
+  renderPredictionTopBar = () =>
+    <View style={{flexDirection: "column", justifyContent: "space-between", flex: 0.15}}>
+      <View style={{
+        flex: 0.8,
+        backgroundColor: 'white',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        width: Layout.window.width,
+      }}>
+        <TextInput
+          onChangeText={this.handlePredictionCorrection}
+          value={this.state.predictedLabel}
+          clearTextOnFocus={true}
+          style={{
+            fontWeight: 'bold',
+            fontSize: 25,
+            textAlign: 'center',
+            color: 'black',
+          }}
+          ref={(ref) => {
+            this.labelInput = ref
+          }}
+        />
+      </View>
+      {this.state.predictedLabel &&
+      <View style={{
+        flex: 0.2,
+        flexDirection: 'column',
+        justifyContent: 'bottom',
+        width: Layout.window.width,
+      }}>
+        <ProgressBarAnimated
+          width={Layout.window.width}
+          value={this.state.confidence * 100}
+          backgroundColor={this.state.confidence < 0.5 ? "red" : this.state.confidence < 0.75 ? "yellow" : "green"}
+          borderRadius={0}
+          borderColor="white"
+          borderWidth={0}
+        />
+      </View>}
+    </View>;
+
   renderPrediction = () =>
     <View style={{flex: 1}}>
       <ImageBackground style={styles.camera} source={{uri: this.state.photo.uri}}>
-        <View style={{
-          flex: 0.1,
-          backgroundColor: 'white',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          width: Layout.window.width,
-        }}>
-          <TextInput
-            onChangeText={this.handlePredictionCorrection}
-            value={this.state.predictedLabel}
-            clearTextOnFocus={true}
-            style={{
-              fontWeight: 'bold',
-              fontSize: 25,
-              textAlign: 'center',
-              color: 'black',
-            }}
-            ref={(ref) => {this.labelInput = ref}}
-          />
-        </View>
-        {!this.state.predictedLabel && <ActivityIndicator size="large" color="white" />}
+        {this.renderPredictionTopBar()}
+        {!this.state.predictedLabel && <ActivityIndicator size="large" color="white"/>}
         {this.renderPredictionBottomBar()}
       </ImageBackground>
     </View>;

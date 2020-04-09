@@ -38,6 +38,7 @@
     "react-native-elements": "^1.2.7",
     "react-native-gesture-handler": "~1.6.0",
     "react-native-is-iphonex": "^1.0.1",
+    "react-native-progress-bar-animated": "^1.0.6",
     "react-native-reanimated": "^1.7.1",
     "react-native-safe-area-context": "0.7.3",
     "react-native-screens": "~2.2.0",
