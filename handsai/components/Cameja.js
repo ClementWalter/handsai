@@ -225,7 +225,7 @@ export default class CameraScreen extends React.Component {
         <TextInput
           onChangeText={this.handlePredictionCorrection}
           value={this.state.predictedLabel}
-          clearTextOnFocus={true}
+          selectTextOnFocus={true}
           style={{
             fontWeight: 'bold',
             fontSize: 25,
