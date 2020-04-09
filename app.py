@@ -5,6 +5,11 @@ from flask_cors import CORS
 
 
 app = Flask(__name__, static_folder="handsai/web-build")
+if app.env == "production":
+    app.config.from_object("config.Config")
+if app.env == "development":
+    app.config.from_object("config.DevelopmentConfig")
+
 CORS(app)
 
 
@@ -20,14 +25,14 @@ def index(path):
 
 @app.route("/status")
 def status():
-    response = requests.get("http://handsai-serving.herokuapp.com/v1/models/siamese_nets_classifier")
+    response = requests.get(f"{app.config['SERVING_URI']}/v1/models/siamese_nets_classifier")
     return Response(response.text, status=response.status_code, content_type=response.headers["content-type"])
 
 
 @app.route("/predict", methods=["POST"])
 def predict():
     response = requests.post(
-        "http://handsai-serving.herokuapp.com/v1/models/siamese_nets_classifier:predict", json=request.json
+        f"{app.config['SERVING_URI']}/v1/models/siamese_nets_classifier:predict", json=request.json
     )
     return Response(response.text, status=response.status_code, content_type=response.headers["content-type"])
 

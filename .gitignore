@@ -2,3 +2,4 @@ models
 .idea
 __pycache__
 *egg-info
+config.py
