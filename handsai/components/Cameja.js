@@ -1,5 +1,5 @@
 import React from 'react';
-import { ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
 import * as ImageManipulator from "expo-image-manipulator";
@@ -62,7 +62,7 @@ export default class CameraScreen extends React.Component {
     permissionsGranted: false,
     prediction: null,
     predictionStatus: null,
-    predictionLabel: null,
+    predictedLabel: null,
     support_set_loss: null,
     overwrite: true,
   };
@@ -236,6 +236,7 @@ export default class CameraScreen extends React.Component {
             ref={(ref) => {this.labelInput = ref}}
           />
         </View>
+        {!this.state.predictedLabel && <ActivityIndicator size="large" color="white" />}
         {this.renderPredictionBottomBar()}
       </ImageBackground>
     </View>;
