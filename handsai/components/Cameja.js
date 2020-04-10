@@ -67,6 +67,7 @@ export default class CameraScreen extends React.Component {
     predictedLabel: null,
     support_set_loss: null,
     overwrite: true,
+    boundingBox: null,
   };
 
   componentDidMount = async () => {
@@ -108,12 +109,26 @@ export default class CameraScreen extends React.Component {
     );
   };
 
-  base64WebSafe = (base64) => base64.replace(/(?:\r\n|\r|\n)/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  crop = async (uri, boundingBox) => {
+    const crop = {
+      originX: boundingBox.x1,
+      originY: boundingBox.y1,
+      width: boundingBox.x2 - boundingBox.x1,
+      height: boundingBox.y2 - boundingBox.y1,
+    }
+    return ImageManipulator.manipulateAsync(
+      uri,
+      [{crop}],
+      {format: ImageManipulator.SaveFormat.JPEG},
+    );
+  };
+
+  base64WebSafe = (base64) => base64.replace(/(?:\r\n|\r|\n)/g, '').replace(/\+/g, '-').replace(/\//g, '_').split(',').pop();
 
   predict = async (base64) => {
     let body = JSON.stringify({
       "signature_name": "decode_and_serve",
-      "inputs": {"image_bytes": [this.base64WebSafe(base64).split(',').pop()]},
+      "inputs": {"image_bytes": [this.base64WebSafe(base64)]},
     });
 
     try {
@@ -135,13 +150,17 @@ export default class CameraScreen extends React.Component {
   };
 
   sendPredictionFeedback = async () => {
-    this.setState({predictionStatus: null});
+    let crop = this.state.photo
+    if (this.state.boundingBox) {
+      crop = await this.crop(this.state.photo.uri, this.state.boundingBox)
+    }
+    const cropLow = await this.resize(crop)
 
     let body = JSON.stringify({
       "signature_name": "set_support_set",
       "inputs": {
-        "image_bytes": [this.base64WebSafe(this.state.photoLow.base64).split(',').pop()],
-        "crop_window": [[0, 0, this.state.photoLow.height, this.state.photoLow.width]],
+        "image_bytes": [this.base64WebSafe(cropLow.base64)],
+        "crop_window": [[0, 0, cropLow.height, cropLow.width]],
         "label": [this.state.predictedLabel],
         "overwrite": this.state.overwrite,
       },
@@ -158,7 +177,13 @@ export default class CameraScreen extends React.Component {
     if (response.ok) {
       const response_body = await response.json();
       console.log("catalog loss", response_body["outputs"][0]);
-      this.setState({support_set_loss: response_body["outputs"][0], overwrite: false, predictedLabel: null})
+      this.setState({
+        support_set_loss: response_body["outputs"][0],
+        overwrite: false,
+        predictedLabel: null,
+        predictionStatus: null,
+        boundingBox: null,
+      })
     }
   };
 
@@ -215,7 +240,7 @@ export default class CameraScreen extends React.Component {
     </View>;
 
   renderPredictionTopBar = () =>
-    <View style={{flexDirection: "column", justifyContent: "space-between", flex: 0.15}}>
+    <View style={{flexDirection: "column", justifyContent: "space-between", flex: 0.20}}>
       <View style={{
         flex: 0.8,
         backgroundColor: 'white',
@@ -260,9 +285,13 @@ export default class CameraScreen extends React.Component {
     <View style={{flex: 1}}>
       <ImageBackground style={styles.camera} source={{uri: this.state.photo.uri}}>
         {this.renderPredictionTopBar()}
-        {!this.state.predictedLabel && <ActivityIndicator size="large" color="white"/>}
-        <BoundingBoxDraw handleBoundingBoxChange={() => {}}/>
-        {this.renderPredictionBottomBar()}
+        {!this.state.predictedLabel &&
+        <View style={{flex: 1, flexDirection: "columns", justifyContent: "center"}}><ActivityIndicator size="large"
+                                                                                                       color="white"/></View>}
+        {this.state.predictedLabel && <BoundingBoxDraw handleBoundingBoxChange={(boundingBox) => {
+          this.setState({boundingBox})
+        }}/>}
+        {this.state.predictedLabel && this.renderPredictionBottomBar()}
       </ImageBackground>
     </View>;
 
@@ -328,7 +357,7 @@ const styles = StyleSheet.create({
   bottomBar: {
     backgroundColor: 'transparent',
     justifyContent: 'space-around',
-    flex: 0.15,
+    flex: 0.2,
     flexDirection: 'row',
   },
   noPermissions: {

@@ -6,11 +6,15 @@ import { PIXI } from 'expo-pixi';
 
 export default class BoundingBoxDraw extends React.Component {
 
-  handleBoundingBoxChange;
-
   onChange = async () => {
     const boundingBox = this.computeBoundingBox();
     const points = this.boundingBoxToPoints(boundingBox);
+    this.drawRect(points)
+    this.sketch.renderer._update();
+    this.props.handleBoundingBoxChange(boundingBox)
+  };
+
+  drawRect = (points) => {
     this.sketch.stage.removeChildren();
     const graphics = new PIXI.Graphics();
     this.sketch.stage.addChild(graphics);
@@ -25,9 +29,7 @@ export default class BoundingBoxDraw extends React.Component {
       }
     }
     graphics.endFill();
-    this.sketch.renderer._update();
-    this.props.handleBoundingBoxChange(boundingBox)
-  };
+  }
 
   computeBoundingBox = () => {
     const x_coordinates = this.sketch.points.map((point) => point.x)
