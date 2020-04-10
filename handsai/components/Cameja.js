@@ -7,6 +7,7 @@ import Layout from '../constants/Layout';
 import { Ionicons, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import getEnvVars from '../environment';
 import ProgressBarAnimated from 'react-native-progress-bar-animated';
+import BoundingBoxDraw from './BoundingBoxDraw';
 
 const {apiUrl} = getEnvVars();
 
@@ -260,6 +261,7 @@ export default class CameraScreen extends React.Component {
       <ImageBackground style={styles.camera} source={{uri: this.state.photo.uri}}>
         {this.renderPredictionTopBar()}
         {!this.state.predictedLabel && <ActivityIndicator size="large" color="white"/>}
+        <BoundingBoxDraw handleBoundingBoxChange={() => {}}/>
         {this.renderPredictionBottomBar()}
       </ImageBackground>
     </View>;
