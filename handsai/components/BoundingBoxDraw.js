@@ -60,7 +60,6 @@ export default class BoundingBoxDraw extends React.Component {
       strokeAlpha={1}
       ref={ref => (this.sketch = ref)}
       onChange={this.onChange}
-      onReady={this.onReady}
       transparent={true}
       style={{flex: 1, height: Layout.window.height, width: Layout.window.width, ...this.props.style}}
     />
