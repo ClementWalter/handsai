@@ -241,8 +241,9 @@ export default class CameraScreen extends React.Component {
       </TouchableOpacity>
     </View>;
 
-  renderPredictionTopBar = () =>
-    <View style={{flexDirection: "column", justifyContent: "space-between", flex: 0.20}}>
+  renderPredictionTopBar = () => {
+    const confidence = Math.max(this.state.confidence * 2 - 1, this.state.confidence)
+    return <View style={{flexDirection: "column", justifyContent: "space-between", flex: 0.20}}>
       <View style={{
         flex: 0.8,
         backgroundColor: 'white',
@@ -252,7 +253,7 @@ export default class CameraScreen extends React.Component {
       }}>
         <TextInput
           onChangeText={this.handlePredictionCorrection}
-          value={this.state.predictedLabel}
+          value={this.state.predictedLabel || " "}
           selectTextOnFocus={true}
           style={{
             fontWeight: 'bold',
@@ -274,14 +275,15 @@ export default class CameraScreen extends React.Component {
       }}>
         <ProgressBarAnimated
           width={Layout.window.width}
-          value={this.state.confidence * 100}
-          backgroundColor={this.state.confidence < 0.5 ? "red" : this.state.confidence < 0.75 ? "yellow" : "green"}
+          value={confidence * 100}
+          backgroundColor={confidence < 0.5 ? "red" : confidence < 0.75 ? "yellow" : "green"}
           borderRadius={0}
           borderColor="white"
           borderWidth={0}
         />
       </View>}
     </View>;
+  }
 
   renderPrediction = () =>
     <View style={{flex: 1}}>
@@ -297,7 +299,7 @@ export default class CameraScreen extends React.Component {
       </ImageBackground>
     </View>;
 
-  handlePredictionCorrection = (predictedLabel) => this.setState({predictedLabel});
+  handlePredictionCorrection = (predictedLabel) => this.setState({predictedLabel: predictedLabel.trim() || " "});
 
   renderCamera = () =>
     (
