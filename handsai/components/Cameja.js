@@ -131,20 +131,22 @@ export default class CameraScreen extends React.Component {
       "inputs": {"image_bytes": [this.base64WebSafe(base64)]},
     });
 
-    try {
-      let response = await fetch(`${apiUrl}/predict`, {
-        method: "POST",
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body,
-      });
-      if (response.ok) {
-        return await response.json()
+    if (!this.state.overwrite) {
+      try {
+        let response = await fetch(`${apiUrl}/predict`, {
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body,
+        });
+        if (response.ok) {
+          return await response.json()
+        }
+      } catch (e) {
+        console.log(e)
       }
-    } catch (e) {
-      console.log(e)
     }
     return responseStub
   };
