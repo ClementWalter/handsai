@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Camera } from 'expo-camera';
-import * as Permissions from 'expo-permissions';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 const flashModeOrder = {
@@ -45,12 +44,6 @@ export default class CameraScreen extends React.Component {
     whiteBalance: 'auto',
     ratio: '16:9',
     ratios: [],
-    permissionsGranted: false,
-  };
-
-  componentDidMount = async () => {
-    const {status} = await Permissions.askAsync(Permissions.CAMERA);
-    this.setState({permissionsGranted: status === 'granted'});
   };
 
   toggleFacing = () => this.setState({type: this.state.type === 'back' ? 'front' : 'back'});
@@ -69,13 +62,6 @@ export default class CameraScreen extends React.Component {
   };
 
   handleMountError = ({message}) => console.error(message);
-
-  renderNoPermissions = () =>
-    <View style={styles.noPermissions}>
-      <Text style={{color: 'black'}}>
-        Camera permissions not granted - cannot open camera preview.
-      </Text>
-    </View>;
 
   renderTopBar = () =>
     <View
@@ -127,10 +113,7 @@ export default class CameraScreen extends React.Component {
     );
 
   render() {
-    const content = this.state.permissionsGranted
-                                ? this.renderCamera()
-                                : this.renderNoPermissions();
-    return <View style={styles.container}>{content}</View>;
+    return <View style={styles.container}>{this.renderCamera()}</View>;
   }
 }
 

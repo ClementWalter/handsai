@@ -20,7 +20,7 @@ export default class Prediction extends React.Component {
 
   renderLabel = () => <View style={styles.labelBar}>
     <TextInput
-      onChangeText={this.props.handlePredictionCorrection}
+      onChangeText={this.props.handlePredictionCorrection("label")}
       value={this.props.prediction && this.props.prediction.label}
       selectTextOnFocus={true}
       style={styles.labelText}
@@ -36,7 +36,7 @@ export default class Prediction extends React.Component {
     return <View style={styles.confidenceBar}>
       <ProgressBarAnimated
         width={Layout.window.width}
-        value={confidence}
+        value={confidence * 100}
         backgroundColor={backgroundColor}
         borderRadius={0}
         borderColor="white"
@@ -66,7 +66,8 @@ export default class Prediction extends React.Component {
       <ImageBackground style={styles.background} source={{uri: this.props.uri}}>
         {this.renderTopBar()}
         {!this.props.prediction && <View style={styles.loader}><ActivityIndicator size="large" color="white"/></View>}
-        {!!this.props.prediction && <BoundingBoxDraw handleBoundingBoxChange={() => {}}/>}
+        {!!this.props.prediction &&
+        <BoundingBoxDraw handleBoundingBoxChange={this.props.handlePredictionCorrection("boundingBox")}/>}
         {!!this.props.prediction && this.renderBottomBar()}
       </ImageBackground>
     </View>;
@@ -101,7 +102,7 @@ const styles = StyleSheet.create({
   confidenceBar: {
     flex: 0.2,
     flexDirection: 'column',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
     width: Layout.window.width,
   },
   bottomBar: {
