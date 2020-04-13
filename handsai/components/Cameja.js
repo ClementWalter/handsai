@@ -50,7 +50,7 @@ const responseStub = {
   },
 };
 
-export default class CameraScreen extends React.Component {
+export default class Cameja extends React.Component {
   state = {
     flash: 'off',
     zoom: 0,

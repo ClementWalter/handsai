@@ -5,7 +5,7 @@ import * as Font from 'expo-font';
 
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
-import Cameja from './components/Cameja';
+import HomeScreen from './components/HomeScreen';
 
 export default class App extends React.Component {
   state = {
@@ -24,7 +24,7 @@ export default class App extends React.Component {
     } else {
       return (
         <View style={styles.container}>
-          <Cameja />
+          <HomeScreen />
         </View>
       )
     }
