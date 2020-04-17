@@ -7,6 +7,17 @@ import BoundingBoxDraw from './BoundingBoxDraw';
 
 export default class Prediction extends React.Component {
 
+  state = {
+    showLoader: true
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (!nextProps.prediction !== prevState.showLoader) {
+      return {showLoader: !nextProps.prediction}
+    }
+    return null
+  }
+
   handleMountError = ({message}) => console.error(message);
 
   onLabelReject = () => this.labelInput.focus();
@@ -65,10 +76,10 @@ export default class Prediction extends React.Component {
     return <View style={{flex: 1}}>
       <ImageBackground style={styles.background} source={{uri: this.props.uri}}>
         {this.renderTopBar()}
-        {!this.props.prediction && <View style={styles.loader}><ActivityIndicator size="large" color="white"/></View>}
-        {!!this.props.prediction &&
+        {this.state.showLoader && <View style={styles.loader}><ActivityIndicator size="large" color="white"/></View>}
+        {!this.state.showLoader &&
         <BoundingBoxDraw handleBoundingBoxChange={this.props.handlePredictionCorrection("boundingBox")}/>}
-        {!!this.props.prediction && this.renderBottomBar()}
+        {!this.state.showLoader && this.renderBottomBar()}
       </ImageBackground>
     </View>;
   }
