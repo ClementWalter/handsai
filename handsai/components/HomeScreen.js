@@ -18,6 +18,9 @@ export default class HomeScreen extends React.Component {
   }
 
   componentDidMount = async () => {
+    fetch(`${apiUrl}/status`, {
+      method: "GET",
+    }).then(r => console.log("status", r));
     if (!this.state.permissionsGranted) {
       const {status} = await Permissions.askAsync(Permissions.CAMERA);
       this.setState({permissionsGranted: status === 'granted'});
