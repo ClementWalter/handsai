@@ -8,19 +8,23 @@ import BoundingBoxDraw from './BoundingBoxDraw';
 export default class Prediction extends React.Component {
 
   state = {
-    showLoader: true
+    showLoader: true,
   }
 
-  static getDerivedStateFromProps(nextProps, prevState) {
-    if (!nextProps.prediction !== prevState.showLoader) {
-      return {showLoader: !nextProps.prediction}
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.prediction !== this.props.prediction) {
+      this.setState({ showLoader: !this.props.prediction})
     }
-    return null
   }
 
   handleMountError = ({message}) => console.error(message);
 
   onLabelReject = () => this.labelInput.focus();
+
+  onLabelAccept = () => {
+    this.setState({showLoader: true})
+    this.props.onLabelAccept();
+  }
 
   renderTopBar = () => {
     return <View style={styles.topBar}>
@@ -65,7 +69,7 @@ export default class Prediction extends React.Component {
         <FontAwesome name="times-circle" size={60} style={styles.labelKo}/>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={this.props.onLabelAccept}
+        onPress={this.onLabelAccept}
         style={{alignSelf: 'center'}}
       >
         <FontAwesome name="check-circle" size={60} style={styles.labelOk}/>
