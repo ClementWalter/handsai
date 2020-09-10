@@ -1,4 +1,5 @@
+app
 serving
-handsai
-!handsai/web-build
+web
+!web/build
 .git

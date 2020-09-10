@@ -3,3 +3,4 @@ models
 __pycache__
 *egg-info
 config.py
+.DS_Store

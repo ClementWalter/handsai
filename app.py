@@ -4,7 +4,7 @@ from flask import Flask, request, send_from_directory, Response
 from flask_cors import CORS
 
 
-app = Flask(__name__, static_folder="handsai/web-build")
+app = Flask(__name__, static_folder="web/build")
 if app.env == "production":
     app.config.from_object("config.Config")
 if app.env == "development":

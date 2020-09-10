@@ -4,8 +4,8 @@ line-length = 120
 [tool.poetry]
 name = "handsai"
 version = "0.1.0"
-description = "Build computer vision models with you smartphone"
-authors = ["Clément Walter <clementw@sicara.com>"]
+description = "Build computer vision models with your smartphone"
+authors = ["Clément Walter <clementw@handsai.me>"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
