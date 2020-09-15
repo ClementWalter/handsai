@@ -2,7 +2,7 @@ import React from "react";
 import tw from "twin.macro";
 import { css } from "styled-components/macro"; //eslint-disable-line
 import AnimationRevealPage from "helpers/AnimationRevealPage.js";
-import Hero from "components/hero/TwoColumnWithInput.js";
+import Hero from "components/hero/BackgroundAsImageWithCenteredContent.js";
 import Features from "components/features/ThreeColWithSideImage.js";
 import MainFeature from "components/features/TwoColWithButton.js";
 import MainFeature2 from "components/features/TwoColWithTwoHorizontalFeaturesAndButton.js";
@@ -14,9 +14,11 @@ import GetStarted from "components/cta/GetStarted";
 import Footer from "components/footers/FiveColumnWithBackground.js";
 import heroScreenshotImageSrc from "images/hero-screenshot-1.png";
 import macHeroScreenshotImageSrc from "images/hero-screenshot-2.png";
+import appMockUpSrc from "images/mockups/iterate_mockup.png";
 import prototypeIllustrationImageSrc from "images/prototype-illustration.svg";
-import { ReactComponent as BriefcaseIcon } from "feather-icons/dist/icons/briefcase.svg";
-import { ReactComponent as MoneyIcon } from "feather-icons/dist/icons/dollar-sign.svg";
+import { ReactComponent as VersatileIcon } from "feather-icons/dist/icons/code.svg";
+import { ReactComponent as FreeIcon } from "feather-icons/dist/icons/dollar-sign.svg";
+import { ReactComponent as ImmediateIcon } from "images/fast-icon.svg";
 
 export default () => {
   const Subheading = tw.span`uppercase tracking-widest font-bold text-primary-500`;
@@ -24,7 +26,7 @@ export default () => {
 
   return (
     <AnimationRevealPage>
-      <Hero roundedHeaderButton={true} />
+      <Hero roundedHeaderButton={true}/>
       {/*<Features*/}
       {/*  subheading={<Subheading>Features</Subheading>}*/}
       {/*  heading={*/}
@@ -39,6 +41,39 @@ export default () => {
       {/*  imageBorder={true}*/}
       {/*  imageDecoratorBlob={true}*/}
       {/*/>*/}
+      <MainFeature2
+        subheading={<Subheading>features</Subheading>}
+        heading={
+          <>
+            A tool for Product Owners with <HighlightedText>vision.</HighlightedText>
+          </>
+        }
+        description="The most straightforward solution from your idea to its realization. Because no existing model is actually the one you need, HandsAi lets you build your own tool with your own characteristics"
+        imageSrc={prototypeIllustrationImageSrc}
+        showDecoratorBlob={false}
+        features={[
+          {
+            Icon: FreeIcon,
+            title: "Free",
+            description: "You don't need data nor data scientists to start. Build on your own, check, for free.",
+            iconContainerCss: tw`bg-green-300 text-green-800`,
+          },
+          {
+            Icon: ImmediateIcon,
+            title: "Immediate",
+            description: "Tailor-made your model yourself, instantly.",
+            iconContainerCss: tw`bg-green-300 text-green-800`,
+          },
+          {
+            Icon: VersatileIcon,
+            title: "Versatile",
+            description: "Once you are done, your model is ready to be used by the IT team on any platform or device.",
+            iconContainerCss: tw`bg-green-300 text-green-800`,
+          },
+        ]}
+        primaryButtonText="Request demo"
+        primaryButtonUrl="mailto:clement@handsai.me"
+      />
       <FeatureWithSteps
         subheading={<Subheading>No computer, just vision</Subheading>}
         heading={
@@ -47,34 +82,10 @@ export default () => {
           </>
         }
         textOnLeft={false}
-        imageSrc={macHeroScreenshotImageSrc}
-        imageDecoratorBlob={true}
-        decoratorBlobCss={tw`xl:w-40 xl:h-40 opacity-15 -translate-x-1/2 left-1/2`}
+        imageSrc={appMockUpSrc}
+        imageDecoratorBlob={false}
+        // decoratorBlobCss={tw`xl:w-40 xl:h-40 opacity-15 -translate-x-1/2 left-1/2`}
       />
-      {/*<MainFeature2*/}
-      {/*  subheading={<Subheading>VALUES</Subheading>}*/}
-      {/*  heading={*/}
-      {/*    <>*/}
-      {/*      We Always Abide by Our <HighlightedText>Principles.</HighlightedText>*/}
-      {/*    </>*/}
-      {/*  }*/}
-      {/*  imageSrc={prototypeIllustrationImageSrc}*/}
-      {/*  showDecoratorBlob={false}*/}
-      {/*  features={[*/}
-      {/*    {*/}
-      {/*      Icon: MoneyIcon,*/}
-      {/*      title: "Affordable",*/}
-      {/*      description: "We promise to offer you the best rate we can - at par with the industry standard.",*/}
-      {/*      iconContainerCss: tw`bg-green-300 text-green-800`*/}
-      {/*    },*/}
-      {/*    {*/}
-      {/*      Icon: BriefcaseIcon,*/}
-      {/*      title: "Professionalism",*/}
-      {/*      description: "We assure you that our templates are designed and created by professional designers.",*/}
-      {/*      iconContainerCss: tw`bg-red-300 text-red-800`*/}
-      {/*    }*/}
-      {/*  ]}*/}
-      {/*/>*/}
       {/*<Pricing*/}
       {/*  subheading={<Subheading>Pricing</Subheading>}*/}
       {/*  heading={*/}
@@ -123,7 +134,7 @@ export default () => {
       {/*      quote:*/}
       {/*        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.",*/}
       {/*      customerName: "Charlotte Hale",*/}
-      {/*      customerTitle: "Director, Delos Inc."*/}
+      {/*      customerTitle: "Director, Delos Inc.",*/}
       {/*    },*/}
       {/*    {*/}
       {/*      stars: 5,*/}
@@ -133,8 +144,8 @@ export default () => {
       {/*      quote:*/}
       {/*        "Sinor Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",*/}
       {/*      customerName: "Adam Cuppy",*/}
-      {/*      customerTitle: "Founder, EventsNYC"*/}
-      {/*    }*/}
+      {/*      customerTitle: "Founder, EventsNYC",*/}
+      {/*    },*/}
       {/*  ]}*/}
       {/*/>*/}
       {/*<FAQ*/}
@@ -178,7 +189,7 @@ export default () => {
       {/*  ]}*/}
       {/*/>*/}
       <GetStarted/>
-      <Footer />
+      <Footer/>
     </AnimationRevealPage>
   );
 }

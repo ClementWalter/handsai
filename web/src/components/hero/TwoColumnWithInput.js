@@ -56,10 +56,10 @@ export default ({ roundedHeaderButton }) => {
         <TwoColumn>
           <LeftColumn>
             <Heading>
-              Your products, <span tw="text-primary-500">your vision.</span>
+              Your products, <span tw="text-primary-500">your AI.</span>
             </Heading>
             <Paragraph>
-              Build and test computer vision models with your smartphone, in minutes
+              Do be stuck with public APIs and their built-in rules. Build and test your computer vision models with your smartphone, in minutes
             </Paragraph>
             <PrimaryLink href="mailto:clement@handsai.me">Request demo</PrimaryLink>
             {/*<Actions href="mailto:clement@handsai.me">*/}
