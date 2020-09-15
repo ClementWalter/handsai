@@ -68,7 +68,7 @@ export default ({
     },
     {
       heading: "Iterate",
-      description: "Do so until you feel confident about your model"
+      description: "Play with your phone until you feel confident about your model"
     },
     {
       heading: "Deploy",

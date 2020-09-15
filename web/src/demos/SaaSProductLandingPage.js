@@ -48,7 +48,7 @@ export default () => {
             A tool for Product Owners with <HighlightedText>vision.</HighlightedText>
           </>
         }
-        description="The most straightforward solution from your idea to its realization. Because no existing model is actually the one you need, HandsAi lets you build your own with your own characteristics."
+        description="The most straightforward way to implement your idea. Because no existing model is actually the one you need, HandsAi enables you to build your model based on your own and unique products."
         imageSrc={prototypeIllustrationImageSrc}
         showDecoratorBlob={false}
         features={[
@@ -61,13 +61,13 @@ export default () => {
           {
             Icon: ImmediateIcon,
             title: "Immediate",
-            description: "Tailor-made your model yourself, instantly.",
+            description: "Create your tailor-made your model yourself, instantly.",
             iconContainerCss: tw`bg-green-300 text-green-800`,
           },
           {
             Icon: VersatileIcon,
             title: "Versatile",
-            description: "Once you are done, your model is ready to be used by the IT team on any platform or device.",
+            description: "Once you are done, your model is ready to be implemented on any platform or device.",
             iconContainerCss: tw`bg-green-300 text-green-800`,
           },
         ]}
