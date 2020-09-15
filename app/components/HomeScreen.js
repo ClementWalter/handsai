@@ -59,7 +59,7 @@ export default class HomeScreen extends React.Component {
   };
 
   sendPredictionFeedback = async () => {
-    console.log("this.state.prediction", this.state.prediction)
+    console.log("Prediction for feedback", this.state.prediction)
     let photo = this.state.photo
     if (this.state.prediction.boundingBox) {
       photo = await crop(this.state.photo.uri, this.state.prediction.boundingBox)
