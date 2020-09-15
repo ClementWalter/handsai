@@ -48,7 +48,7 @@ export default () => {
             A tool for Product Owners with <HighlightedText>vision.</HighlightedText>
           </>
         }
-        description="The most straightforward solution from your idea to its realization. Because no existing model is actually the one you need, HandsAi lets you build your own tool with your own characteristics"
+        description="The most straightforward solution from your idea to its realization. Because no existing model is actually the one you need, HandsAi lets you build your own with your own characteristics."
         imageSrc={prototypeIllustrationImageSrc}
         showDecoratorBlob={false}
         features={[
