@@ -64,7 +64,7 @@ export default ({
     },
     {
       heading: "Evaluate",
-      description: "Confirm of edit the prediction"
+      description: "Confirm or edit the prediction"
     },
     {
       heading: "Iterate",

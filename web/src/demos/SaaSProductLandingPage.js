@@ -61,7 +61,7 @@ export default () => {
           {
             Icon: ImmediateIcon,
             title: "Immediate",
-            description: "Create your tailor-made your model yourself, instantly.",
+            description: "Instantly create and update your model with your smartphone.",
             iconContainerCss: tw`bg-green-300 text-green-800`,
           },
           {
