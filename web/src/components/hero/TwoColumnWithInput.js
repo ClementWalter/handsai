@@ -61,7 +61,7 @@ export default ({ roundedHeaderButton }) => {
             <Paragraph>
               Do be stuck with public APIs and their built-in rules. Build and test your computer vision models with your smartphone, in minutes
             </Paragraph>
-            <PrimaryLink href="mailto:clement@handsai.me">Request demo</PrimaryLink>
+            <PrimaryLink href="/contact">Request demo</PrimaryLink>
             {/*<Actions href="mailto:clement@handsai.me">*/}
             {/*  Request demo*/}
             {/*  /!*<input type="text" placeholder="Your E-mail Address" />*!/*/}

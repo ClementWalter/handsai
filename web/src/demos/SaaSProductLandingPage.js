@@ -72,7 +72,7 @@ export default () => {
           },
         ]}
         primaryButtonText="Request demo"
-        primaryButtonUrl="mailto:clement@handsai.me"
+        primaryButtonUrl="/contact"
       />
       <FeatureWithSteps
         subheading={<Subheading>No computer, just vision</Subheading>}

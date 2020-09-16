@@ -25,7 +25,7 @@ const DecoratorBlob2 = tw(SvgDecoratorBlob1)`absolute top-0 right-0 w-80 h-80 tr
 export default ({
   text = "Start building now with the palm of your hand.",
   primaryLinkText = "Contact Us",
-  primaryLinkUrl = "mailto:clement@handsai.me",
+  primaryLinkUrl = "/contact",
   // secondaryLinkText = "Contact Us",
   // secondaryLinkUrl = "http://google.com",
   pushDownFooter = true

@@ -78,7 +78,7 @@ export default () => {
               Build and test your computer vision models with your smartphone, in minutes
             </p>
           </Heading>
-          <PrimaryLink href="mailto:clement@handsai.me">Request demo</PrimaryLink>
+          <PrimaryLink href="/contact">Request demo</PrimaryLink>
         </Content>
       </HeroContainer>
     </Container>
