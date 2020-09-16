@@ -7,6 +7,7 @@ import Footer from "components/footers/FiveColumnWithBackground.js";
 import ContactUsForm from "components/forms/TwoColContactUsWithIllustrationFullForm.js";
 import ContactDetails from "components/cards/ThreeColContactDetails.js";
 
+import getEnvVars from 'environment.js';
 const Address = tw.span`leading-relaxed`;
 const AddressLine = tw.span`block`;
 const Email = tw.span`text-sm mt-6 block text-gray-500`;
@@ -16,7 +17,7 @@ export default () => {
   return (
     <AnimationRevealPage>
       <Header />
-      <ContactUsForm subheading="" formAction="http://localhost:5000/api/contact" formMethod="POST"/>
+      <ContactUsForm subheading="" formAction={`${getEnvVars().apiUrl}/api/contact`} formMethod="POST"/>
       {/*<ContactDetails*/}
       {/*  cards={[*/}
       {/*    {*/}
