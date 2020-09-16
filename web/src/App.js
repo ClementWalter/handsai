@@ -96,7 +96,7 @@ import SaaSProductLandingPage from "demos/SaaSProductLandingPage.js";
 // import SignupPage from "pages/Signup.js";
 // import PricingPage from "pages/Pricing.js";
 // import AboutUsPage from "pages/AboutUs.js";
-// import ContactUsPage from "pages/ContactUs.js";
+import ContactUsPage from "pages/ContactUs.js";
 // import BlogIndexPage from "pages/BlogIndex.js";
 // import TermsOfServicePage from "pages/TermsOfService.js";
 // import PrivacyPolicyPage from "pages/PrivacyPolicy.js";
@@ -104,31 +104,28 @@ import SaaSProductLandingPage from "demos/SaaSProductLandingPage.js";
 // import ComponentRenderer from "ComponentRenderer.js";
 // import MainLandingPage from "MainLandingPage.js";
 //
-// import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
-// export default function App() {
-//   // return <AnimationRevealPage disabled></AnimationRevealPage>;
-//   return (
-//     <Router>
-//       <Switch>
-//         <Route path="/components/:type/:subtype/:name">
-//           <ComponentRenderer />
-//         </Route>
-//         <Route path="/components/:type/:name">
-//           <ComponentRenderer />
-//         </Route>
-//         <Route path="/">
-//           <MainLandingPage />
-//         </Route>
-//       </Switch>
-//     </Router>
-//   );
-// }
+export default function App() {
+  // return <AnimationRevealPage disabled></AnimationRevealPage>;
+  return (
+    <Router>
+      <Switch>
+        <Route path="/contact">
+          <ContactUsPage />
+        </Route>
+        <Route path="/">
+          <SaaSProductLandingPage />
+        </Route>
+      </Switch>
+    </Router>
+  );
+}
 
 // export default EventLandingPage;
 // export default HotelTravelLandingPage;
 // export default AgencyLandingPage;
-export default SaaSProductLandingPage;
+// export default SaaSProductLandingPage;
 // export default RestaurantLandingPage;
 // export default ServiceLandingPage;
 // export default HostingCloudLandingPage;

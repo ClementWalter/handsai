@@ -1,10 +1,15 @@
 import os
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 import requests
-from flask import Flask, request, send_from_directory, Response
+from flask import Blueprint, Flask, Response, redirect, request, send_from_directory, url_for
 from flask_cors import CORS
 
-
 app = Flask(__name__, static_folder="web/build")
+api = Blueprint("api", __name__, url_prefix="/api")
+
 if app.env == "production":
     app.config.from_object("config.Config")
 if app.env == "development":
@@ -23,6 +28,30 @@ def index(path):
         return send_from_directory(app.static_folder, "index.html")
 
 
+# Define api
+@api.route("/contact", methods=["POST"])
+def contact():
+    data = request.form
+    contact_password = os.environ["PASSWORD"]
+    contact_address = os.environ["CONTACT"]
+    message = MIMEMultipart()
+    message["From"] = data.get("email")
+    message["To"] = contact_address
+    message["Subject"] = data.get("subject")
+    message.attach(MIMEText(data.get("message"), "plain"))
+    session = smtplib.SMTP("mail.gandi.net", 587)
+    session.starttls()
+    session.login(contact_address, contact_password)
+    text = message.as_string()
+    session.sendmail(data.get("email"), contact_address, text)
+    session.quit()
+    return redirect(url_for("index"))
+
+
+app.register_blueprint(api)
+
+
+# Wrap tensorflow api
 @app.route("/status")
 def status():
     response = requests.get(f"{app.config['SERVING_URI']}/v1/models/siamese_nets_classifier")

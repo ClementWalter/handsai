@@ -19,7 +19,7 @@ import { ReactComponent as HandleIcon } from "images/handle-icon.svg";
 import { ReactComponent as ArrowRightIcon} from "images/arrow-right-3-icon.svg";
 
 import heroScreenshotImageSrc from "images/demo/MainLandingPageHero.png";
-import logo from "images/logo.svg";
+import logo from "images/logo256.svg";
 import useInView from "use-in-view";
 
 /* Hero */
