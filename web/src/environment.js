@@ -3,7 +3,7 @@ const ENV = {
    apiUrl: "http://localhost:5000",
  },
  prod: {
-   apiUrl: "https://handsai.herokuapp.com",
+   apiUrl: "https://handsai.me",
  }
 };
 
