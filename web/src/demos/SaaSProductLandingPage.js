@@ -41,6 +41,18 @@ export default () => {
       {/*  imageBorder={true}*/}
       {/*  imageDecoratorBlob={true}*/}
       {/*/>*/}
+      <FeatureWithSteps
+        subheading={<Subheading>No computer, just vision</Subheading>}
+        heading={
+          <>
+            Don't think about AI, <HighlightedText>focus on business.</HighlightedText>
+          </>
+        }
+        textOnLeft={false}
+        imageSrc={appMockUpSrc}
+        imageDecoratorBlob={false}
+        // decoratorBlobCss={tw`xl:w-40 xl:h-40 opacity-15 -translate-x-1/2 left-1/2`}
+      />
       <MainFeature2
         subheading={<Subheading>features</Subheading>}
         heading={
@@ -73,18 +85,6 @@ export default () => {
         ]}
         primaryButtonText="Request demo"
         primaryButtonUrl="/contact"
-      />
-      <FeatureWithSteps
-        subheading={<Subheading>No computer, just vision</Subheading>}
-        heading={
-          <>
-            Don't think about AI, <HighlightedText>focus on business.</HighlightedText>
-          </>
-        }
-        textOnLeft={false}
-        imageSrc={appMockUpSrc}
-        imageDecoratorBlob={false}
-        // decoratorBlobCss={tw`xl:w-40 xl:h-40 opacity-15 -translate-x-1/2 left-1/2`}
       />
       {/*<Pricing*/}
       {/*  subheading={<Subheading>Pricing</Subheading>}*/}
