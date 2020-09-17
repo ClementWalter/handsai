@@ -30,8 +30,9 @@ def contact():
     contact_password = os.environ["PASSWORD"]
     contact_address = os.environ["CONTACT"]
     message = MIMEMultipart()
-    message["From"] = data.get("email")
+    message["From"] = contact_address
     message["To"] = contact_address
+    message["Reply-to"] = data.get("email")
     message["Subject"] = data.get("subject")
     message.attach(MIMEText(data.get("message"), "plain"))
     session = smtplib.SMTP("mail.gandi.net", 587)
