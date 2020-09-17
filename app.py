@@ -2,6 +2,7 @@ import os
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from http import HTTPStatus
 
 import requests
 from flask import Blueprint, Flask, Response, redirect, request, send_from_directory, url_for
@@ -10,12 +11,12 @@ from flask_cors import CORS
 app = Flask(__name__, static_folder="web/build")
 api = Blueprint("api", __name__, url_prefix="/api")
 
-if app.env == "production":
-    app.config.from_object("config.Config")
-if app.env == "development":
-    app.config.from_object("config.DevelopmentConfig")
-
 CORS(app)
+
+
+def https_redirect():
+    if request.scheme == "http":
+        return redirect(url_for(request.endpoint, _scheme="https", _external=True), HTTPStatus.PERMANENT_REDIRECT)
 
 
 # Serve React App
@@ -65,6 +66,12 @@ def predict():
     )
     return Response(response.text, status=response.status_code, content_type=response.headers["content-type"])
 
+
+if app.env == "production":
+    app.config.from_object("config.Config")
+    app.before_request(https_redirect)
+if app.env == "development":
+    app.config.from_object("config.DevelopmentConfig")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
