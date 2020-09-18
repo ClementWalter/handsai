@@ -66,7 +66,7 @@ export default () => {
         features={[
           {
             Icon: FreeIcon,
-            title: "Free",
+            title: "Efficient",
             description: "You don't need data nor data scientists to start. Build on your own, check, for free.",
             iconContainerCss: tw`bg-green-300 text-green-800`,
           },
