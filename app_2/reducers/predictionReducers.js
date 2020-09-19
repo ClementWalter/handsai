@@ -1,10 +1,10 @@
 const predictionReducers = (state = {}, action) => {
   switch (action.type) {
-    case 'REQUEST_PREDICTION_RECEIVED': {
+    case 'UPDATE_PREDICTION': {
       return {
         ...state,
-        ...action.prediction,
-      };
+        ...action.prediction
+      }
     }
     default: {
       return state;

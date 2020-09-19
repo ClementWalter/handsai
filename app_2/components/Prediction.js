@@ -10,6 +10,8 @@ import {
   View,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { requestPrediction, updatePrediction } from '../actions/predictionActions';
+import { connect } from 'react-redux';
 
 const width = Dimensions.get('window').width;
 const styles = StyleSheet.create({
@@ -61,6 +63,10 @@ const styles = StyleSheet.create({
 
 class Prediction extends React.Component {
 
+  componentDidMount() {
+    this.props.requestPrediction()
+  }
+
   onLabelReject = () => this.labelInput.focus();
 
   renderTopBar = () => {
@@ -69,9 +75,12 @@ class Prediction extends React.Component {
     </View>;
   }
 
+  onLabelChange = (label) => this.props.updatePrediction({label})
+
   renderLabel = () => <View style={styles.labelBar}>
     <TextInput
       value={this.props.prediction && this.props.prediction.label}
+      onChangeText={this.onLabelChange}
       selectTextOnFocus={true}
       style={styles.labelText}
       ref={(ref) => {
@@ -98,9 +107,9 @@ class Prediction extends React.Component {
 
   render() {
     return <View style={{flex: 1}}>
-      <ImageBackground style={styles.background} source={{uri: this.props.uri}}>
+      <ImageBackground style={styles.background} source={{uri: this.props.photo.uri}}>
         {this.renderTopBar()}
-        {this.props.prediction ? this.renderBottomBar() :
+        {!!this.props.prediction ? this.renderBottomBar() :
          <View style={styles.loader}><ActivityIndicator size="large" color="white"/></View>}
       </ImageBackground>
     </View>;
@@ -108,11 +117,21 @@ class Prediction extends React.Component {
 }
 
 Prediction.propTypes = {
-  uri: PropTypes.string.isRequired,
+  photo: PropTypes.object.isRequired,
   prediction: PropTypes.shape({
     label: PropTypes.string,
     confidence: PropTypes.number,
   }),
 }
 
-export default Prediction
+const mapStateToProps = (state) => ({
+    prediction: state.prediction,
+  })
+;
+
+const mapDispatchToProps = (dispatch, props) => ({
+  requestPrediction: () => dispatch(requestPrediction(props.photo)),
+  updatePrediction: (prediction) => dispatch(updatePrediction(prediction)),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Prediction)

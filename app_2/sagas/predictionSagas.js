@@ -1,5 +1,5 @@
 import { put, takeLatest } from 'redux-saga/effects';
-import { requestPredictionReceived } from '../actions/predictionActions';
+import { updatePrediction } from '../actions/predictionActions';
 import { base64WebSafe, resize } from '../utils/imageUtils';
 import getEnvVars from '../environment';
 
@@ -29,7 +29,7 @@ function* requestPrediction(action) {
     confidence = Math.max(...scores);
     label = labels.length > 0 ? labels[scores.indexOf(confidence)] : label;
   }
-  yield put(requestPredictionReceived({label, confidence}));
+  yield put(updatePrediction({label, confidence}));
 }
 
 export function* watchRequestPrediction() {
