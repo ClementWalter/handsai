@@ -1,4 +1,5 @@
 import React from 'react';
+import { Asset } from 'expo-asset'
 import PropTypes from 'prop-types';
 import {
   ActivityIndicator,
@@ -10,8 +11,9 @@ import {
   View,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { requestPrediction, updatePrediction } from '../actions/predictionActions';
+import { requestPrediction, updatePrediction, validatePrediction } from '../actions/predictionActions';
 import { connect } from 'react-redux';
+import isEmpty from 'lodash/isEmpty';
 
 const width = Dimensions.get('window').width;
 const styles = StyleSheet.create({
@@ -19,6 +21,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
+    backgroundColor: '#6E00FF',
   },
   topBar: {
     flex: 0.2,
@@ -64,10 +67,12 @@ const styles = StyleSheet.create({
 class Prediction extends React.Component {
 
   componentDidMount() {
-    this.props.requestPrediction()
+    this.props.requestPrediction(this.props.prediction.photo)
   }
 
   onLabelReject = () => this.labelInput.focus();
+
+  onLabelAccept = () => this.props.validatePrediction(this.props.prediction, true);
 
   renderTopBar = () => {
     return <View style={styles.topBar}>
@@ -106,10 +111,11 @@ class Prediction extends React.Component {
     </View>;
 
   render() {
+    const source = isEmpty(this.props.prediction) ? require('../assets/splash.png') : {uri: this.props.prediction.photo.uri}
     return <View style={{flex: 1}}>
-      <ImageBackground style={styles.background} source={{uri: this.props.photo.uri}}>
+      <ImageBackground style={styles.background} source={source}>
         {this.renderTopBar()}
-        {!!this.props.prediction ? this.renderBottomBar() :
+        {!!this.props.prediction.label ? this.renderBottomBar() :
          <View style={styles.loader}><ActivityIndicator size="large" color="white"/></View>}
       </ImageBackground>
     </View>;
@@ -117,8 +123,8 @@ class Prediction extends React.Component {
 }
 
 Prediction.propTypes = {
-  photo: PropTypes.object.isRequired,
   prediction: PropTypes.shape({
+    photo: PropTypes.object,
     label: PropTypes.string,
     confidence: PropTypes.number,
   }),
@@ -129,9 +135,10 @@ const mapStateToProps = (state) => ({
   })
 ;
 
-const mapDispatchToProps = (dispatch, props) => ({
-  requestPrediction: () => dispatch(requestPrediction(props.photo)),
+const mapDispatchToProps = (dispatch) => ({
+  requestPrediction: (photo) => dispatch(requestPrediction(photo)),
   updatePrediction: (prediction) => dispatch(updatePrediction(prediction)),
+  validatePrediction: (prediction, overwrite) => dispatch(validatePrediction(prediction, overwrite)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Prediction)

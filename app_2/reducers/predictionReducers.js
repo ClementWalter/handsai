@@ -6,6 +6,9 @@ const predictionReducers = (state = {}, action) => {
         ...action.prediction
       }
     }
+    case 'CLEAR_PREDICTION': {
+      return {}
+    }
     default: {
       return state;
     }
