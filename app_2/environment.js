@@ -1,0 +1,20 @@
+const ENV = {
+ dev: {
+   apiUrl: "http://172.20.10.3:5000",
+ },
+ prod: {
+   apiUrl: "https://handsai.herokuapp.com",
+ }
+};
+
+const getEnvVars = () => {
+ // What is __DEV__ ?
+ // This variable is set to true when react-native is running in Dev mode.
+ // __DEV__ is true when run locally, but false when published.
+ if (__DEV__) {
+   return ENV.dev;
+ }
+ return ENV.prod;
+};
+
+export default getEnvVars;

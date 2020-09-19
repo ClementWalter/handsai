@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 
-import crudReducers from './crudReducers';
+import predictionReducers from './predictionReducers';
 
 export default combineReducers({
-  photos: crudReducers,
+  prediction: predictionReducers,
 });

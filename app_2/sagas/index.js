@@ -1,10 +1,9 @@
 import { all, fork } from 'redux-saga/effects';
 
-import { watchIncreaseCounter, watchDecreaseCounter } from './photosSagas';
+import { watchRequestPrediction } from './predictionSagas';
 
 export default function* rootSaga () {
   yield all([
-    fork(watchIncreaseCounter),
-    fork(watchDecreaseCounter),
+    fork(watchRequestPrediction),
   ]);
 }

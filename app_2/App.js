@@ -4,7 +4,7 @@ import { Asset } from 'expo-asset'
 import * as Font from 'expo-font';
 import Swiper from 'react-native-swiper'
 import React from 'react'
-import { Button, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import HomeScreen from './components/HomeScreen';
 import Gallery from './components/Gallery';
 
