@@ -1,5 +1,4 @@
 import React from 'react';
-import { Asset } from 'expo-asset'
 import PropTypes from 'prop-types';
 import {
   ActivityIndicator,
@@ -72,7 +71,7 @@ class Prediction extends React.Component {
 
   onLabelReject = () => this.labelInput.focus();
 
-  onLabelAccept = () => this.props.validatePrediction(this.props.prediction, true);
+  onLabelAccept = () => this.props.validatePrediction(this.props.prediction, isEmpty(this.props.supportSet));
 
   renderTopBar = () => {
     return <View style={styles.topBar}>
@@ -132,6 +131,7 @@ Prediction.propTypes = {
 
 const mapStateToProps = (state) => ({
     prediction: state.prediction,
+    supportSet: state.supportSet,
   })
 ;
 
