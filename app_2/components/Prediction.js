@@ -127,6 +127,7 @@ Prediction.propTypes = {
     label: PropTypes.string,
     confidence: PropTypes.number,
   }),
+  supportSet: PropTypes.object
 }
 
 const mapStateToProps = (state) => ({

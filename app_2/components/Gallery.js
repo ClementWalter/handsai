@@ -1,5 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Dimensions, Image, ScrollView, View, StyleSheet } from 'react-native';
+import { connect } from 'react-redux';
 
 const styles = StyleSheet.create({
   container: {
@@ -22,15 +24,28 @@ const styles = StyleSheet.create({
   },
 })
 
-export default ({captures = []}) => (
-  <ScrollView
-    horizontal={true}
-    style={[styles.bottomToolbar, styles.container]}
-  >
-    {captures.map(({uri}) => (
-      <View style={styles.imageContainer} key={uri}>
-        <Image source={{uri}} style={styles.image}/>
-      </View>
-    ))}
-  </ScrollView>
-);
+class Gallery extends React.Component {
+
+  render() {
+    return <ScrollView
+      horizontal={true}
+    >
+      {Object.keys(this.props.supportSet).map((uri) => (
+        <View style={styles.imageContainer} key={uri}>
+          <Image source={{uri}} style={styles.image}/>
+        </View>
+      ))}
+    </ScrollView>
+  }
+}
+
+Gallery.propTypes = {
+  supportSet: PropTypes.object
+}
+
+const mapStateToProps = (state) => ({
+    supportSet: state.supportSet,
+  })
+;
+
+export default connect(mapStateToProps, null)(Gallery)
