@@ -11,6 +11,9 @@ import Gallery from './components/Gallery';
 import { Provider } from 'react-redux';
 
 import { store } from './store/store';
+import getEnvVars from './environment';
+
+const {apiUrl} = getEnvVars();
 
 export default class App extends React.Component {
   state = {
@@ -55,6 +58,7 @@ export default class App extends React.Component {
         ...Icon.FontAwesome.font,
         ...Icon.Feather.font,
       }),
+      fetch(`${apiUrl}/status`, {method: "GET"}),
     ])
   };
 
