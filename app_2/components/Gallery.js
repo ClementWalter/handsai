@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 const styles = StyleSheet.create({
   container: {
-    bottom: 100,
+    width: Dimensions.get('window').width,
   },
   imageContainer: {
     width: 75,
@@ -17,7 +17,6 @@ const styles = StyleSheet.create({
     height: 75,
   },
   bottomToolbar: {
-    width: Dimensions.get('window').width,
     position: 'absolute',
     height: 100,
     bottom: 0,
@@ -27,9 +26,7 @@ const styles = StyleSheet.create({
 class Gallery extends React.Component {
 
   render() {
-    return <ScrollView
-      horizontal={true}
-    >
+    return <ScrollView style={styles.container}>
       {Object.keys(this.props.supportSet).map((uri) => (
         <View style={styles.imageContainer} key={uri}>
           <Image source={{uri}} style={styles.image}/>
