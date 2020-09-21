@@ -13,6 +13,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { requestPrediction, updatePrediction, validatePrediction } from '../actions/predictionActions';
 import { connect } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
+import { ProgressBar } from 'react-native-paper';
 
 const width = Dimensions.get('window').width;
 const styles = StyleSheet.create({
@@ -41,12 +42,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'black',
   },
-  confidenceBar: {
+  confidenceContainer: {
     flex: 0.2,
     flexDirection: 'column',
     justifyContent: 'flex-start',
     width: width,
   },
+  progressBar: {width, height: 10},
   bottomBar: {
     backgroundColor: 'transparent',
     justifyContent: 'space-around',
@@ -76,6 +78,7 @@ class Prediction extends React.Component {
   renderTopBar = () => {
     return <View style={styles.topBar}>
       {this.renderLabel()}
+      {this.renderConfidence()}
     </View>;
   }
 
@@ -92,6 +95,18 @@ class Prediction extends React.Component {
       }}
     />
   </View>
+
+  renderConfidence = () => {
+    const confidence = this.props.prediction ? this.props.prediction.confidence : 0;
+    const backgroundColor = confidence < 0.5 ? "red" : confidence < 0.75 ? "yellow" : "green"
+    return <View style={styles.confidenceContainer}>
+      <ProgressBar
+        style={styles.progressBar}
+        progress={confidence}
+        color={backgroundColor}
+      />
+    </View>
+  }
 
   renderBottomBar = () =>
     <View style={styles.bottomBar}>
@@ -127,7 +142,7 @@ Prediction.propTypes = {
     label: PropTypes.string,
     confidence: PropTypes.number,
   }),
-  supportSet: PropTypes.object
+  supportSet: PropTypes.object,
 }
 
 const mapStateToProps = (state) => ({
