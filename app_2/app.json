@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "app_2",
-    "slug": "app_2",
+    "name": "handsai",
+    "slug": "handsai",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,6 +21,7 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "description": "Build computer vision models with your smartphone, use them anywhere."
   }
 }
