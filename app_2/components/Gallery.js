@@ -1,43 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Dimensions, Image, ScrollView, View, StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
+import Gallery from "react-native-photo-browser";
+import { YellowBox } from 'react-native'
 
-const styles = StyleSheet.create({
-  container: {
-    width: Dimensions.get('window').width,
-  },
-  imageContainer: {
-    width: 75,
-    height: 75,
-    marginRight: 5,
-  },
-  image: {
-    width: 75,
-    height: 75,
-  },
-  bottomToolbar: {
-    position: 'absolute',
-    height: 100,
-    bottom: 0,
-  },
-})
+YellowBox.ignoreWarnings([ // TODO: Remove when fixed
+  'VirtualizedLists should never be nested',
+  'Animated: `useNativeDriver` was not specified',
+])
 
-class Gallery extends React.Component {
+class GalleryScreen extends React.Component {
 
   render() {
-    return <ScrollView style={styles.container}>
-      {Object.keys(this.props.supportSet).map((uri) => (
-        <View style={styles.imageContainer} key={uri}>
-          <Image source={{uri}} style={styles.image}/>
-        </View>
-      ))}
-    </ScrollView>
+    const mediaList = Object.values(this.props.supportSet).map((prediction) => ({
+      photo: prediction.photo.uri,
+      caption: prediction.label,
+    }))
+    return (
+      <Gallery mediaList={mediaList} startOnGrid={true}/>
+    );
   }
 }
 
-Gallery.propTypes = {
-  supportSet: PropTypes.object
+GalleryScreen.propTypes = {
+  supportSet: PropTypes.object,
 }
 
 const mapStateToProps = (state) => ({
@@ -45,4 +31,4 @@ const mapStateToProps = (state) => ({
   })
 ;
 
-export default connect(mapStateToProps, null)(Gallery)
+export default connect(mapStateToProps, null)(GalleryScreen)
