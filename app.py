@@ -19,6 +19,8 @@ CORS(app)
 def index(path):
     if path != "" and os.path.exists(app.static_folder + "/" + path):
         return send_from_directory(app.static_folder, path)
+    elif path != "" and os.path.exists("models" + "/" + path):
+        return send_from_directory("models", path)
     else:
         return send_from_directory(app.static_folder, "index.html")
 

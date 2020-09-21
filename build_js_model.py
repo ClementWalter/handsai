@@ -2,7 +2,13 @@ import tensorflowjs as tfjs
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 
-model = load_model("../Keras-FewShotLearning/siamese_nets_classifier/1")
+model = load_model("serving/models/siamese_nets_classifier/1")
+
+#%% Extract encoder and support layer
+encoder = model.layers[0]
+tfjs.converters.save_keras_model(encoder, "models/encoder/keras")
+tf.saved_model.save(encoder, "models/encoder/saved_model/1")
+tfjs.converters.convert_tf_saved_model("models/encoder/saved_model/1", "models/encoder/graph")
 
 #%% Create fake catalog
 support_set_size = 1

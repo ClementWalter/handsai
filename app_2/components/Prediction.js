@@ -125,7 +125,7 @@ class Prediction extends React.Component {
     </View>;
 
   render() {
-    const source = isEmpty(this.props.prediction) ? require('../assets/splash.png') : {uri: this.props.prediction.photo.uri}
+    const source = isEmpty(this.props.prediction) ? require('../assets/images/splash.png') : {uri: this.props.prediction.photo.uri}
     return <View style={{flex: 1}}>
       <ImageBackground style={styles.background} source={source}>
         {this.renderTopBar()}
