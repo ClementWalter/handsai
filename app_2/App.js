@@ -7,6 +7,8 @@ import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import HomeScreen from './components/HomeScreen';
 import Gallery from './components/Gallery';
+import * as tf from "@tensorflow/tfjs"
+import "@tensorflow/tfjs-react-native"
 
 import { Provider } from 'react-redux';
 
@@ -58,6 +60,7 @@ export default class App extends React.Component {
         ...Icon.FontAwesome.font,
         ...Icon.Feather.font,
       }),
+      tf.ready(),
       fetch(`${apiUrl}/status`, {method: "GET"}),
     ])
   };

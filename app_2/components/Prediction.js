@@ -14,7 +14,10 @@ import { requestPrediction, updatePrediction, validatePrediction } from '../acti
 import { connect } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 import { ProgressBar } from 'react-native-paper';
+import getEnvVars from '../environment';
+import * as tf from '@tensorflow/tfjs';
 
+const {apiUrl} = getEnvVars();
 const width = Dimensions.get('window').width;
 const styles = StyleSheet.create({
   background: {
@@ -67,7 +70,22 @@ const styles = StyleSheet.create({
 
 class Prediction extends React.Component {
 
-  componentDidMount() {
+  state = {
+    encoder: null,
+    kernel: null,
+  }
+
+  async componentDidMount() {
+
+    const encoderUrl = `${apiUrl}/encoder/graph/model.json`
+    const encoder = await tf.loadGraphModel(encoderUrl)
+    const embedding = encoder.predict(tf.zeros([1, 224, 224, 3]))
+
+    const kernelUrl = `${apiUrl}/kernel/graph/model.json`
+    const kernel = await tf.loadGraphModel(kernelUrl)
+    kernel.predict([embedding, embedding])
+
+    this.setState({encoder, kernel})
     this.props.requestPrediction(this.props.prediction.photo)
   }
 
