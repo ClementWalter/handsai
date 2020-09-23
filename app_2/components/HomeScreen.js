@@ -44,7 +44,7 @@ const mapStateToProps = (state) => ({
   })
 ;
 
-const mapDispatchToProps = (dispatch, props) => ({
+const mapDispatchToProps = (dispatch) => ({
   clearPrediction: () => dispatch(clearPrediction()),
   updatePrediction: (prediction) => dispatch(updatePrediction(prediction)),
 })

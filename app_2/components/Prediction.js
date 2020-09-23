@@ -16,6 +16,8 @@ import isEmpty from 'lodash/isEmpty';
 import { ProgressBar } from 'react-native-paper';
 import getEnvVars from '../environment';
 import * as tf from '@tensorflow/tfjs';
+import { decodeJpeg } from "@tensorflow/tfjs-react-native"
+import { base64WebSafe, resize } from '../utils/imageUtils';
 
 const {apiUrl} = getEnvVars();
 const width = Dimensions.get('window').width;
@@ -79,14 +81,37 @@ class Prediction extends React.Component {
 
     const encoderUrl = `${apiUrl}/encoder/graph/model.json`
     const encoder = await tf.loadGraphModel(encoderUrl)
-    const embedding = encoder.predict(tf.zeros([1, 224, 224, 3]))
 
     const kernelUrl = `${apiUrl}/kernel/graph/model.json`
     const kernel = await tf.loadGraphModel(kernelUrl)
-    kernel.predict([embedding, embedding])
 
     this.setState({encoder, kernel})
+
+    await this.predict()
     this.props.requestPrediction(this.props.prediction.photo)
+  }
+
+  async predict() {
+    const photoLow = await resize(224, 224)(this.props.prediction.photo)
+    console.log("photoLow", photoLow)
+    const imgBuffer = tf.util.encodeString(photoLow.base64, 'base64').buffer;
+    console.log("imgBuffer", imgBuffer)
+    const raw = new Uint8Array(imgBuffer)
+    const imageTensor = decodeJpeg(raw);
+    console.log("imageTensor", imageTensor)
+    const padHeight = photoLow.width > photoLow.height ? photoLow.width - photoLow.height : 0;
+    const padWidth = photoLow.height > photoLow.width ? photoLow.height - photoLow.width : 0;
+    const paddedTensor = (
+      imageTensor
+        .pad([[0, padHeight], [0, padWidth], [0, 0]])
+        .cast('float32')
+        .div(255)
+        .expandDims(0)
+    )
+    console.log("paddedTensor", paddedTensor)
+    const embedding = this.state.encoder.predict(paddedTensor)
+    const confidence = this.state.kernel.predict([embedding, embedding])
+    confidence.print()
   }
 
   onLabelReject = () => this.labelInput.focus();
