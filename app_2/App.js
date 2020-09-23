@@ -14,6 +14,8 @@ import { Provider } from 'react-redux';
 
 import { store } from './store/store';
 import getEnvVars from './environment';
+import encoder from './models/encoder'
+import kernel from './models/kernel';
 
 const {apiUrl} = getEnvVars();
 
@@ -62,6 +64,10 @@ export default class App extends React.Component {
       }),
       tf.ready(),
       fetch(`${apiUrl}/status`, {method: "GET"}),
+    ])
+    await Promise.all([
+      encoder.loadModel(),
+      kernel.loadModel(),
     ])
   };
 

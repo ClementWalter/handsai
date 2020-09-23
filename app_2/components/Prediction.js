@@ -17,7 +17,9 @@ import { ProgressBar } from 'react-native-paper';
 import getEnvVars from '../environment';
 import * as tf from '@tensorflow/tfjs';
 import { decodeJpeg } from "@tensorflow/tfjs-react-native"
-import { base64WebSafe, resize } from '../utils/imageUtils';
+import { resize } from '../utils/imageUtils';
+import encoder from '../models/encoder';
+import kernel from '../models/kernel';
 
 const {apiUrl} = getEnvVars();
 const width = Dimensions.get('window').width;
@@ -73,20 +75,11 @@ const styles = StyleSheet.create({
 class Prediction extends React.Component {
 
   state = {
-    encoder: null,
-    kernel: null,
+    encoder: encoder,
+    kernel: kernel,
   }
 
   async componentDidMount() {
-
-    const encoderUrl = `${apiUrl}/encoder/graph/model.json`
-    const encoder = await tf.loadGraphModel(encoderUrl)
-
-    const kernelUrl = `${apiUrl}/kernel/graph/model.json`
-    const kernel = await tf.loadGraphModel(kernelUrl)
-
-    this.setState({encoder, kernel})
-
     await this.predict()
     this.props.requestPrediction(this.props.prediction.photo)
   }
@@ -109,8 +102,8 @@ class Prediction extends React.Component {
         .expandDims(0)
     )
     console.log("paddedTensor", paddedTensor)
-    const embedding = this.state.encoder.predict(paddedTensor)
-    const confidence = this.state.kernel.predict([embedding, embedding])
+    const embedding = this.state.encoder.getModel().predict(paddedTensor)
+    const confidence = this.state.kernel.getModel().predict([embedding, embedding])
     confidence.print()
   }
 
