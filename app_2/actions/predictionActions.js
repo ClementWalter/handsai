@@ -1,11 +1,10 @@
-export const requestPrediction = (photo) => ({type: 'REQUEST_PREDICTION', photo})
+export const requestPrediction = (prediction, supportSet) => ({type: 'REQUEST_PREDICTION', prediction, supportSet})
 
 export const updatePrediction = (prediction) => ({type: 'UPDATE_PREDICTION', prediction})
 
-export const validatePrediction = (prediction, overwrite) => ({
+export const validatePrediction = (prediction) => ({
   type: 'VALIDATE_PREDICTION',
   prediction,
-  overwrite,
 })
 
 export const savePrediction = (prediction) => ({

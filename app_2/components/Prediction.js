@@ -14,14 +14,7 @@ import { requestPrediction, updatePrediction, validatePrediction } from '../acti
 import { connect } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 import { ProgressBar } from 'react-native-paper';
-import getEnvVars from '../environment';
-import * as tf from '@tensorflow/tfjs';
-import { decodeJpeg } from "@tensorflow/tfjs-react-native"
-import { resize } from '../utils/imageUtils';
-import encoder from '../models/encoder';
-import kernel from '../models/kernel';
 
-const {apiUrl} = getEnvVars();
 const width = Dimensions.get('window').width;
 const styles = StyleSheet.create({
   background: {
@@ -74,42 +67,13 @@ const styles = StyleSheet.create({
 
 class Prediction extends React.Component {
 
-  state = {
-    encoder: encoder,
-    kernel: kernel,
-  }
-
   async componentDidMount() {
-    await this.predict()
-    this.props.requestPrediction(this.props.prediction.photo)
-  }
-
-  async predict() {
-    const photoLow = await resize(224, 224)(this.props.prediction.photo)
-    console.log("photoLow", photoLow)
-    const imgBuffer = tf.util.encodeString(photoLow.base64, 'base64').buffer;
-    console.log("imgBuffer", imgBuffer)
-    const raw = new Uint8Array(imgBuffer)
-    const imageTensor = decodeJpeg(raw);
-    console.log("imageTensor", imageTensor)
-    const padHeight = photoLow.width > photoLow.height ? photoLow.width - photoLow.height : 0;
-    const padWidth = photoLow.height > photoLow.width ? photoLow.height - photoLow.width : 0;
-    const paddedTensor = (
-      imageTensor
-        .pad([[0, padHeight], [0, padWidth], [0, 0]])
-        .cast('float32')
-        .div(255)
-        .expandDims(0)
-    )
-    console.log("paddedTensor", paddedTensor)
-    const embedding = this.state.encoder.getModel().predict(paddedTensor)
-    const confidence = this.state.kernel.getModel().predict([embedding, embedding])
-    confidence.print()
+    this.props.requestPrediction(this.props.prediction, this.props.supportSet)
   }
 
   onLabelReject = () => this.labelInput.focus();
 
-  onLabelAccept = () => this.props.validatePrediction(this.props.prediction, isEmpty(this.props.supportSet));
+  onLabelAccept = () => this.props.validatePrediction(this.props.prediction);
 
   renderTopBar = () => {
     return <View style={styles.topBar}>
@@ -188,9 +152,9 @@ const mapStateToProps = (state) => ({
 ;
 
 const mapDispatchToProps = (dispatch) => ({
-  requestPrediction: (photo) => dispatch(requestPrediction(photo)),
+  requestPrediction: (prediction, supportSet) => dispatch(requestPrediction(prediction, supportSet)),
   updatePrediction: (prediction) => dispatch(updatePrediction(prediction)),
-  validatePrediction: (prediction, overwrite) => dispatch(validatePrediction(prediction, overwrite)),
+  validatePrediction: (prediction) => dispatch(validatePrediction(prediction)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Prediction)
