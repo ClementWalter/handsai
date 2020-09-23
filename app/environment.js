@@ -1,9 +1,9 @@
 const ENV = {
  dev: {
-   apiUrl: "http://192.168.0.11:5000",
+   apiUrl: "http://192.168.0.11:5000/api",
  },
  prod: {
-   apiUrl: "https://handsai.herokuapp.com",
+   apiUrl: "https://handsai.herokuapp.com/api",
  }
 };
 

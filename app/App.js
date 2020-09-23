@@ -13,11 +13,8 @@ import "@tensorflow/tfjs-react-native"
 import { Provider } from 'react-redux';
 
 import { store } from './store/store';
-import getEnvVars from './environment';
 import encoder from './models/encoder'
 import kernel from './models/kernel';
-
-const {apiUrl} = getEnvVars();
 
 export default class App extends React.Component {
   state = {
@@ -25,7 +22,7 @@ export default class App extends React.Component {
   };
 
   render() {
-    if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
+    if (!this.state.isLoadingComplete) {
       return (
         <AppLoading
           startAsync={this._loadResourcesAsync}
@@ -58,12 +55,10 @@ export default class App extends React.Component {
       Font.loadAsync({
         // This is the font that we are using for our tab bar
         ...Icon.MaterialIcons.font,
-        ...Icon.MaterialCommunityIcons.font,
         ...Icon.FontAwesome.font,
         ...Icon.Feather.font,
       }),
       tf.ready(),
-      fetch(`${apiUrl}/status`, {method: "GET"}),
     ])
     await Promise.all([
       encoder.loadModel(),

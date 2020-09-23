@@ -3,8 +3,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-import requests
-from flask import Blueprint, Flask, Response, redirect, request, send_from_directory, url_for
+from flask import Blueprint, Flask, redirect, request, send_from_directory, url_for
 from flask_cors import CORS
 
 app = Flask(__name__, static_folder="web/build")
@@ -19,8 +18,6 @@ CORS(app)
 def index(path):
     if path != "" and os.path.exists(app.static_folder + "/" + path):
         return send_from_directory(app.static_folder, path)
-    elif path != "" and os.path.exists("models" + "/" + path):
-        return send_from_directory("models", path)
     else:
         return send_from_directory(app.static_folder, "index.html")
 
@@ -46,23 +43,12 @@ def contact():
     return redirect(url_for("index"))
 
 
+@api.route("/models/<path:path>")
+def models(path):
+    return send_from_directory("models", path)
+
+
 app.register_blueprint(api)
-
-
-# Wrap tensorflow api
-@app.route("/status")
-def status():
-    response = requests.get(f"{app.config['SERVING_URI']}/v1/models/siamese_nets_classifier")
-    return Response(response.text, status=response.status_code, content_type=response.headers["content-type"])
-
-
-@app.route("/predict", methods=["POST"])
-def predict():
-    response = requests.post(
-        f"{app.config['SERVING_URI']}/v1/models/siamese_nets_classifier:predict", json=request.json
-    )
-    return Response(response.text, status=response.status_code, content_type=response.headers["content-type"])
-
 
 if app.env == "production":
     app.config.from_object("config.Config")

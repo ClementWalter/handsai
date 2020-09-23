@@ -5,16 +5,5 @@ services:
     env_file: .env
     ports:
       - "5000:5000"
-    depends_on:
-      - serving
     volumes:
       - .:/app
-  serving:
-    build:
-      context: ./serving
-    environment:
-      PORT: 8501
-    ports:
-      - "8501:8501"
-    volumes:
-    - ./serving/models:/models
