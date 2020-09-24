@@ -1,5 +1,8 @@
 import * as tf from "@tensorflow/tfjs"
 import "@tensorflow/tfjs-react-native"
+import { logger } from 'react-native-logs';
+
+const log = logger.createLogger();
 
 export class MLModel {
 
@@ -9,9 +12,9 @@ export class MLModel {
   getModel = () => (this.model);
 
   async loadModel() {
-    console.log("loading model", this.url)
+    log.info(`loading model ${this.url}`)
     this.model = await tf.loadGraphModel(this.url);
-    console.log("loaded model", this.url)
+    log.info(`loaded model ${this.url}`)
   }
 
   preprocess = (tensor) => (tensor)
