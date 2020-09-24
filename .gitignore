@@ -1,5 +1,5 @@
 models
-!app_2/models
+!app/models
 .idea
 __pycache__
 *egg-info
