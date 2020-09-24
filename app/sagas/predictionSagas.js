@@ -1,6 +1,7 @@
 import { put, takeLatest } from 'redux-saga/effects';
 import { clearPrediction, savePrediction, updatePrediction } from '../actions/predictionActions';
 import { resize } from '../utils/imageUtils';
+import preprocessing from '../models/preprocessing';
 import encoder from '../models/encoder';
 import kernel from '../models/kernel';
 import { loadBase64, padToSquare } from '../utils/tensorUtils';
@@ -10,12 +11,7 @@ import "@tensorflow/tfjs-react-native"
 
 function* requestEmbedding(action) {
   const photoLow = yield resize(224, 224)(action.prediction.photo)
-  const embedding = encoder.getModel().predict(
-    padToSquare(loadBase64(photoLow.base64))
-      .cast('float32')
-      .div(255)
-      .expandDims(0),
-  )
+  const embedding = encoder.predict(preprocessing.predict(loadBase64(photoLow.base64)))
   yield put(updatePrediction({embedding}));
   return embedding
 }
@@ -27,7 +23,7 @@ function* requestPrediction(action) {
   if (!isEmpty(action.supportSet)) {
     const supportSet = Object.values(action.supportSet)
     const supportSetEmbeddings = tf.concat(supportSet.map((x) => x.embedding))
-    let scores = kernel.getModel().predict([embedding.tile([supportSet.length, 1]), supportSetEmbeddings]).squeeze()
+    let scores = kernel.predict([embedding.tile([supportSet.length, 1]), supportSetEmbeddings]).squeeze()
     scores = scores.arraySync()
     confidence = Array.isArray(scores) ? Math.max(...scores) : scores;
     const index = Array.isArray(scores) ? scores.indexOf(confidence) : 0

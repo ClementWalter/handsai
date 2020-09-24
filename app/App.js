@@ -13,6 +13,7 @@ import "@tensorflow/tfjs-react-native"
 import { Provider } from 'react-redux';
 
 import { store } from './store/store';
+import preprocessing from './models/preprocessing'
 import encoder from './models/encoder'
 import kernel from './models/kernel';
 
@@ -61,6 +62,7 @@ export default class App extends React.Component {
       tf.ready(),
     ])
     await Promise.all([
+      preprocessing.loadModel(),
       encoder.loadModel(),
       kernel.loadModel(),
     ])
