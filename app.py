@@ -5,11 +5,18 @@ from email.mime.text import MIMEText
 
 from flask import Blueprint, Flask, redirect, request, send_from_directory, url_for
 from flask_cors import CORS
+from flask_httpauth import HTTPTokenAuth
 
 app = Flask(__name__, static_folder="web/build")
 api = Blueprint("api", __name__, url_prefix="/api")
 
+auth = HTTPTokenAuth(scheme="Bearer")
 CORS(app)
+
+
+@auth.verify_token
+def verify_token(token):
+    return token == app.config["TOKEN"]
 
 
 # Serve React App
@@ -44,6 +51,7 @@ def contact():
 
 
 @api.route("/models/<path:path>")
+@auth.login_required
 def models(path):
     return send_from_directory("models", path)
 
