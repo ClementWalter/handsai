@@ -105,6 +105,7 @@ class CameraScreen extends React.Component {
     ratio: '16:9',
     ratios: [],
     cameraPermissionsGranted: false,
+    cameraRollPermissionsGranted: false,
   };
 
   allowCameraPermission = async () => {
@@ -143,8 +144,8 @@ class CameraScreen extends React.Component {
 
   openImagePickerAsync = async () => {
     await this.allowCameraRollPermission();
-    const photo = await ImagePicker.launchImageLibraryAsync();
-    if (photo.uri) {
+    const photo = await ImagePicker.launchImageLibraryAsync({allowsEditing: false});
+    if (!photo.cancelled) {
       this.props.handleTakePictureAsync(photo)
     }
   }
