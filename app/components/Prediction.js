@@ -23,6 +23,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#6E00FF',
   },
+  imageStyle: {
+    resizeMode: 'contain',
+  },
   topBar: {
     flex: 0.2,
     flexDirection: "column",
@@ -127,7 +130,7 @@ class Prediction extends React.Component {
   render() {
     const source = isEmpty(this.props.prediction) ? require('../assets/images/splash.png') : {uri: this.props.prediction.photo.uri}
     return <View style={{flex: 1}}>
-      <ImageBackground style={styles.background} source={source}>
+      <ImageBackground style={styles.background} imageStyle={styles.imageStyle} source={source}>
         {this.renderTopBar()}
         {!!this.props.prediction.label ? this.renderBottomBar() :
          <View style={styles.loader}><ActivityIndicator size="large" color="white"/></View>}

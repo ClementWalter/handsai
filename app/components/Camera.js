@@ -142,8 +142,11 @@ class CameraScreen extends React.Component {
   };
 
   openImagePickerAsync = async () => {
+    await this.allowCameraRollPermission();
     const photo = await ImagePicker.launchImageLibraryAsync();
-    this.props.handleTakePictureAsync(photo)
+    if (photo.uri) {
+      this.props.handleTakePictureAsync(photo)
+    }
   }
 
   renderTopBar = () =>
