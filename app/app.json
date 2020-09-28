@@ -10,6 +10,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "primaryColor": "#6E00FF",
     "updates": {
       "fallbackToCacheTimeout": 0
     },
@@ -17,7 +18,17 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "me.handsai.app",
+      "buildNumber": "1.0.0",
+      "infoPlist":{
+        "NSCameraUsageDescription": "This app uses the camera to generate a classification model from the images taken by the user",
+        "NSPhotoLibraryAddUsageDescription": "The app needs to access the photo library in order to let the user select already taken pictures instead of shooting them"
+      }
+    },
+    "android": {
+      "package": "me.handsai.app",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
