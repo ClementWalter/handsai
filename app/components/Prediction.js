@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     width: width,
   },
-  progressBar: {width, height: 10},
+  progressBar: {width, height: 10, backgroundColor: 'transparent'},
   bottomBar: {
     backgroundColor: 'transparent',
     justifyContent: 'space-around',
