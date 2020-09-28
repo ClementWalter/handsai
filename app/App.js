@@ -58,6 +58,7 @@ export default class App extends React.Component {
         ...Icon.MaterialIcons.font,
         ...Icon.FontAwesome.font,
         ...Icon.Feather.font,
+        ...Icon.EvilIcons.font,
       }),
       tf.ready(),
     ])

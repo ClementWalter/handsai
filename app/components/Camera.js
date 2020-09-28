@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { EvilIcons, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
 const flashModeOrder = {
   off: 'on',
@@ -67,8 +68,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     flexDirection: 'row',
     justifyContent: 'space-around',
+    alignItems: 'center',
   },
-  bottomBarIcon: {alignSelf: 'center'},
+  bottomBarCenterContainer: {
+    flex: 0.5,
+  },
+  bottomBarSideContainer: {
+    flex: 0.25,
+  },
+  bottomBarIcon: {
+    alignSelf: 'center',
+  },
   toggleButton: {
     flex: 0.25,
     height: 40,
@@ -94,14 +104,26 @@ class CameraScreen extends React.Component {
     whiteBalance: 'auto',
     ratio: '16:9',
     ratios: [],
-    permissionsGranted: false,
+    cameraPermissionsGranted: false,
   };
 
-  componentDidMount = async () => {
-    if (!this.state.permissionsGranted) {
+  allowCameraPermission = async () => {
+    if (!this.state.cameraPermissionsGranted) {
       const {status} = await Permissions.askAsync(Permissions.CAMERA);
-      this.setState({permissionsGranted: status === 'granted'});
+      this.setState({cameraPermissionsGranted: status === 'granted'});
     }
+  }
+
+  allowCameraRollPermission = async () => {
+    if (!this.state.cameraRollPermissionsGranted) {
+      const {status} = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+      this.setState({cameraRollPermissionsGranted: status === 'granted'});
+    }
+  }
+
+  componentDidMount = async () => {
+    await this.allowCameraPermission();
+    await this.allowCameraRollPermission();
   };
 
   toggleFacing = () => this.setState({type: this.state.type === 'back' ? 'front' : 'back'});
@@ -118,6 +140,11 @@ class CameraScreen extends React.Component {
       this.props.handleTakePictureAsync(photo)
     }
   };
+
+  openImagePickerAsync = async () => {
+    const photo = await ImagePicker.launchImageLibraryAsync();
+    this.props.handleTakePictureAsync(photo)
+  }
 
   renderTopBar = () =>
     <View style={styles.topBar}>
@@ -137,9 +164,17 @@ class CameraScreen extends React.Component {
 
   renderBottomBar = () =>
     <View style={styles.bottomBar}>
-      <TouchableOpacity onPress={this.takePictureAsync} style={styles.bottomBarIcon}>
-        <Ionicons name="ios-radio-button-on" size={70} color="white"/>
-      </TouchableOpacity>
+      <View style={styles.bottomBarSideContainer}>
+        <TouchableOpacity style={styles.bottomBarIcon} onPress={this.openImagePickerAsync}>
+          <EvilIcons name="image" size={60} color="white"/>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.bottomBarCenterContainer}>
+        <TouchableOpacity style={styles.bottomBarIcon} onPress={this.takePictureAsync}>
+          <Ionicons name="ios-radio-button-on" size={70} color="white"/>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.bottomBarSideContainer}/>
     </View>;
 
   renderCamera = () =>
@@ -156,7 +191,6 @@ class CameraScreen extends React.Component {
           zoom={this.state.zoom}
           whiteBalance={this.state.whiteBalance}
           ratio={this.state.ratio}
-          onMountError={this.handleMountError}
         >
           {this.renderTopBar()}
           {this.renderBottomBar()}
@@ -169,11 +203,16 @@ class CameraScreen extends React.Component {
       <Text style={styles.noPermissionsText}>
         Camera permissions not granted - cannot open camera preview.
       </Text>
+      <Button
+        onPress={this.allowCameraPermission}
+        title="Allow camera"
+        color="white"
+      />
     </View>;
 
   render() {
     return <View
-      style={styles.container}>{this.state.permissionsGranted ? this.renderCamera() : this.renderNoPermissions()}</View>;
+      style={styles.container}>{this.state.cameraPermissionsGranted ? this.renderCamera() : this.renderNoPermissions()}</View>;
   }
 }
 
