@@ -4,7 +4,7 @@ import { resize } from '../utils/imageUtils';
 import preprocessing from '../models/preprocessing';
 import encoder from '../models/encoder';
 import kernel from '../models/kernel';
-import { loadBase64, padToSquare } from '../utils/tensorUtils';
+import { loadBase64 } from '../utils/tensorUtils';
 import isEmpty from 'react-native-web/dist/vendor/react-native/isEmpty';
 import * as tf from "@tensorflow/tfjs"
 import "@tensorflow/tfjs-react-native"
