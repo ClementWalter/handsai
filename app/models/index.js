@@ -1,5 +1,4 @@
 import * as tf from "@tensorflow/tfjs"
-import "@tensorflow/tfjs-react-native"
 import { logger } from 'react-native-logs';
 
 const log = logger.createLogger();

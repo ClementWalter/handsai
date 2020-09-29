@@ -7,7 +7,6 @@ import kernel from '../models/kernel';
 import { loadBase64 } from '../utils/tensorUtils';
 import isEmpty from 'react-native-web/dist/vendor/react-native/isEmpty';
 import * as tf from "@tensorflow/tfjs"
-import "@tensorflow/tfjs-react-native"
 
 function* requestEmbedding(action) {
   const photoLow = yield resize(224, 224)(action.prediction.photo)

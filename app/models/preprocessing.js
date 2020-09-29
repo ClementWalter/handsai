@@ -1,5 +1,4 @@
 import * as tf from "@tensorflow/tfjs"
-import "@tensorflow/tfjs-react-native"
 import { MLModel } from './index';
 import getEnvVars from '../environment';
 
