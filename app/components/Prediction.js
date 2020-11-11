@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { updatePrediction, validatePrediction } from '../actions/predictionActions';
+import { updatePrediction, savePrediction } from '../actions/predictionActions';
 import { connect } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 import { ProgressBar } from 'react-native-paper';
@@ -84,7 +84,7 @@ class Prediction extends React.Component {
   onLabelReject = () => this.labelInput.focus();
 
   onLabelAccept = () => {
-    this.props.validatePrediction(this.props.prediction);
+    this.props.savePrediction(this.props.prediction);
     this.props.toggleModal()
   }
 
@@ -156,18 +156,16 @@ Prediction.propTypes = {
     confidence: PropTypes.number,
     uri: PropTypes.string,
   }),
-  supportSet: PropTypes.array,
   toggleModal: PropTypes.func,
 }
 
 const mapStateToProps = (state) => ({
   prediction: state.prediction,
-  supportSet: state.supportSet,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   updatePrediction: (prediction) => dispatch(updatePrediction(prediction)),
-  validatePrediction: (prediction) => dispatch(validatePrediction(prediction)),
+  savePrediction: (prediction) => dispatch(savePrediction(prediction)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Prediction)
