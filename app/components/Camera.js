@@ -131,6 +131,7 @@ const styles = StyleSheet.create({
 
 class CameraScreen extends React.Component {
   rafID;
+  isRecording=false;
 
   state = {
     flash: 'off',
@@ -141,7 +142,6 @@ class CameraScreen extends React.Component {
     ratio: '16:9',
     cameraPermissionsGranted: false,
     cameraRollPermissionsGranted: false,
-    isRecording: false,
     predictions: [],
   };
 
@@ -172,11 +172,12 @@ class CameraScreen extends React.Component {
 
   toggleFocus = () => this.setState({autoFocus: this.state.autoFocus === 'on' ? 'off' : 'on'});
 
-  onPressRadioIn = () => this.setState({isRecording: true});
+  onPressRadioIn = () => {this.isRecording = true};
 
   onPressRadioOut = () => {
+    this.isRecording = false;
     this.props.updatePrediction({predictions: this.state.predictions})
-    this.setState({isRecording: false, predictions: []});
+    this.setState({predictions: []});
     this.props.toggleModal()
   }
 
@@ -209,7 +210,7 @@ class CameraScreen extends React.Component {
 
   handleCameraStream = (stream, updatePreview, gl) => {
     const loop = async () => {
-      if (this.state.isRecording) {
+      if (this.isRecording) {
         let tensor = stream.next().value.reverse(1)
 
         const prediction = await Promise.all([
@@ -264,7 +265,7 @@ class CameraScreen extends React.Component {
         <TouchableOpacity style={styles.bottomBarIcon}
                           onPressIn={this.onPressRadioIn}
                           onPressOut={this.onPressRadioOut}>
-          <Ionicons name="ios-radio-button-on" size={70} color={this.state.isRecording ? "red" : "white"}/>
+          <Ionicons name="ios-radio-button-on" size={70} color={this.isRecording ? "red" : "white"}/>
         </TouchableOpacity>
       </View>
       <View style={styles.bottomBarSideContainer}/>
