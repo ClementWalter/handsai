@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Modal from 'react-native-modal';
 import Prediction from './Prediction';
-import isEmpty from 'lodash/isEmpty';
 import Camera from './Camera';
 import { connect } from 'react-redux';
 import { clearPrediction, updatePrediction } from '../actions/predictionActions';
@@ -18,21 +17,32 @@ const styles = StyleSheet.create({
 
 class Home extends React.Component {
 
-  handleTakePictureAsync = (photo) => this.props.updatePrediction({photo})
+  state = {
+    isModalVisible: false,
+  }
 
-  onSwipeComplete = () => this.props.clearPrediction();
+  toggleModal = () => this.setState({isModalVisible: !this.state.isModalVisible})
+
+  openImagePickerAsync = (images) => {
+    this.props.updatePrediction({images})
+  };
+
+  onSwipeComplete = async () => {
+    await this.toggleModal()
+    this.props.clearPrediction();
+  }
 
   render() {
     return (
       <View style={styles.container}>
-        <Camera handleTakePictureAsync={this.handleTakePictureAsync}/>
-        <Modal isVisible={!isEmpty(this.props.prediction)}
+        <Camera openImagePickerAsync={this.openImagePickerAsync} toggleModal={this.toggleModal}/>
+        <Modal isVisible={this.state.isModalVisible}
                onSwipeComplete={this.onSwipeComplete}
                style={styles.modal}
                backdropOpacity={1}
-               swipeDirection="up"
+               swipeDirection={["up", "down"]}
         >
-          <Prediction/>
+          <Prediction toggleModal={this.toggleModal}/>
         </Modal>
       </View>
     )

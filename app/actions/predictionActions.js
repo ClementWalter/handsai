@@ -15,3 +15,9 @@ export const savePrediction = (prediction) => ({
 export const clearPrediction = () => ({
   type: 'CLEAR_PREDICTION',
 })
+
+
+export const saveTensorAsJpeg = (tensor) => ({
+  type: 'SAVE_TENSOR_AS_JPEG',
+  tensor,
+})

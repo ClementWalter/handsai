@@ -1,11 +1,11 @@
 import * as ImageManipulator from "expo-image-manipulator";
 
-export const resize = (width, height) => async (photo) => {
+export const resize = (width, height, options={}) => async (photo) => {
   const resize = photo.width < photo.height ? {height} : {width};
   return ImageManipulator.manipulateAsync(
     photo.uri,
     [{resize}],
-    {compress: 0.1, format: ImageManipulator.SaveFormat.JPEG, base64: true},
+    {...{format: ImageManipulator.SaveFormat.JPEG, base64: true}, ...options},
   );
 };
 

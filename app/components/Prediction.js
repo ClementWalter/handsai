@@ -10,12 +10,13 @@ import {
   View,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { requestPrediction, updatePrediction, validatePrediction } from '../actions/predictionActions';
+import { updatePrediction, validatePrediction } from '../actions/predictionActions';
 import { connect } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 import { ProgressBar } from 'react-native-paper';
 
 const width = Dimensions.get('window').width;
+
 const styles = StyleSheet.create({
   background: {
     flex: 1,
@@ -71,12 +72,21 @@ const styles = StyleSheet.create({
 class Prediction extends React.Component {
 
   async componentDidMount() {
-    this.props.requestPrediction(this.props.prediction, this.props.supportSet)
+    if (this.props.prediction && !!this.props.prediction.predictions) {
+      this.props.updatePrediction({
+        label: this.props.prediction.predictions[0].label,
+        confidence: this.props.prediction.predictions[0].confidence,
+        uri: this.props.prediction.predictions[0].uri,
+      })
+    }
   }
 
   onLabelReject = () => this.labelInput.focus();
 
-  onLabelAccept = () => this.props.validatePrediction(this.props.prediction);
+  onLabelAccept = () => {
+    this.props.toggleModal()
+    this.props.validatePrediction(this.props.prediction);
+  }
 
   renderTopBar = () => {
     return <View style={styles.topBar}>
@@ -89,7 +99,7 @@ class Prediction extends React.Component {
 
   renderLabel = () => <View style={styles.labelBar}>
     <TextInput
-      value={this.props.prediction && this.props.prediction.label}
+      value={this.props.prediction.label}
       onChangeText={this.onLabelChange}
       selectTextOnFocus={true}
       style={styles.labelText}
@@ -100,7 +110,7 @@ class Prediction extends React.Component {
   </View>
 
   renderConfidence = () => {
-    const confidence = this.props.prediction ? this.props.prediction.confidence : 0;
+    const confidence = this.props.prediction.confidence || 0;
     const backgroundColor = confidence < 0.5 ? "red" : confidence < 0.75 ? "yellow" : "green"
     return <View style={styles.confidenceContainer}>
       <ProgressBar
@@ -128,7 +138,7 @@ class Prediction extends React.Component {
     </View>;
 
   render() {
-    const source = isEmpty(this.props.prediction) ? require('../assets/images/splash.png') : {uri: this.props.prediction.photo.uri}
+    const source = isEmpty(this.props.prediction) ? require('../assets/images/splash.png') : {uri: this.props.prediction.uri}
     return <View style={{flex: 1}}>
       <ImageBackground style={styles.background} imageStyle={styles.imageStyle} source={source}>
         {this.renderTopBar()}
@@ -141,21 +151,21 @@ class Prediction extends React.Component {
 
 Prediction.propTypes = {
   prediction: PropTypes.shape({
-    photo: PropTypes.object,
+    predictions: PropTypes.array,
     label: PropTypes.string,
     confidence: PropTypes.number,
+    uri: PropTypes.string,
   }),
-  supportSet: PropTypes.object,
+  supportSet: PropTypes.array,
+  toggleModal: PropTypes.func,
 }
 
 const mapStateToProps = (state) => ({
-    prediction: state.prediction,
-    supportSet: state.supportSet,
-  })
-;
+  prediction: state.prediction,
+  supportSet: state.supportSet,
+});
 
 const mapDispatchToProps = (dispatch) => ({
-  requestPrediction: (prediction, supportSet) => dispatch(requestPrediction(prediction, supportSet)),
   updatePrediction: (prediction) => dispatch(updatePrediction(prediction)),
   validatePrediction: (prediction) => dispatch(validatePrediction(prediction)),
 })

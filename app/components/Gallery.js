@@ -12,8 +12,8 @@ YellowBox.ignoreWarnings([ // TODO: Remove when fixed
 class GalleryScreen extends React.Component {
 
   render() {
-    const mediaList = Object.values(this.props.supportSet).map((prediction) => ({
-      photo: prediction.photo.uri,
+    const mediaList = this.props.supportSet.map((prediction) => ({
+      photo: prediction.uri,
       caption: prediction.label,
     }))
     return (
@@ -23,7 +23,7 @@ class GalleryScreen extends React.Component {
 }
 
 GalleryScreen.propTypes = {
-  supportSet: PropTypes.object,
+  supportSet: PropTypes.array,
 }
 
 const mapStateToProps = (state) => ({

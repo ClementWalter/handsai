@@ -13,7 +13,7 @@ import { Provider } from 'react-redux';
 
 import { store } from './store/store';
 import preprocessing from './models/preprocessing'
-import encoder from './models/encoder'
+import encoder from './models/encoder';
 import kernel from './models/kernel';
 
 export default class App extends React.Component {
@@ -58,6 +58,7 @@ export default class App extends React.Component {
         ...Icon.FontAwesome.font,
         ...Icon.Feather.font,
         ...Icon.EvilIcons.font,
+        ...Icon.Ionicons.font,
       }),
       tf.ready(),
     ])

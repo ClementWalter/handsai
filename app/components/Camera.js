@@ -1,10 +1,22 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
 import { EvilIcons, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import * as tf from "@tensorflow/tfjs"
+import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
+import preprocessing from '../models/preprocessing';
+import encoder from '../models/encoder';
+import kernel from '../models/kernel';
+import { connect } from 'react-redux';
+import { updatePrediction } from '../actions/predictionActions';
+import { compressJpeg, encodeJpeg } from '../utils/tensorUtils';
+
+const width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
+
+const TensorCamera = cameraWithTensors(Camera)
 
 const flashModeOrder = {
   off: 'on',
@@ -53,18 +65,40 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: 'white',
   },
+  cameraView: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+  },
   camera: {
-    flex: 1,
-    justifyContent: 'space-between',
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    width,
+    height,
+    zIndex: 0,
   },
   topBar: {
-    flex: 0.2,
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    width: "100%",
+    height: Math.floor(0.2 * height),
+    zIndex: 20,
     backgroundColor: 'transparent',
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
   bottomBar: {
-    flex: 0.2,
+    position: 'absolute',
+    left: 0,
+    bottom: 0,
+    width: "100%",
+    height: Math.floor(0.2 * height),
+    zIndex: 20,
     backgroundColor: 'transparent',
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -96,6 +130,8 @@ const styles = StyleSheet.create({
 });
 
 class CameraScreen extends React.Component {
+  rafID;
+
   state = {
     flash: 'off',
     zoom: 0,
@@ -103,9 +139,10 @@ class CameraScreen extends React.Component {
     type: 'back',
     whiteBalance: 'auto',
     ratio: '16:9',
-    ratios: [],
     cameraPermissionsGranted: false,
     cameraRollPermissionsGranted: false,
+    isRecording: false,
+    predictions: [],
   };
 
   allowCameraPermission = async () => {
@@ -135,18 +172,68 @@ class CameraScreen extends React.Component {
 
   toggleFocus = () => this.setState({autoFocus: this.state.autoFocus === 'on' ? 'off' : 'on'});
 
-  takePictureAsync = async () => {
-    if (this.camera) {
-      const photo = await this.camera.takePictureAsync({quality: 0});
-      this.props.handleTakePictureAsync(photo)
-    }
-  };
+  onPressRadioIn = () => this.setState({isRecording: true});
+
+  onPressRadioOut = () => {
+    this.props.updatePrediction({predictions: this.state.predictions})
+    this.setState({isRecording: false, predictions: []});
+    this.props.toggleModal()
+  }
 
   openImagePickerAsync = async () => {
     await this.allowCameraRollPermission();
     const photo = await ImagePicker.launchImageLibraryAsync({allowsEditing: false});
     if (!photo.cancelled) {
-      this.props.handleTakePictureAsync(photo)
+      this.props.openImagePickerAsync(photo)
+    }
+  }
+
+  predict = (tensor) => {
+    const embedding = encoder.predict(preprocessing.predict(tensor))
+    let confidence = 0
+    let label = "NO_LABEL"
+    let index = 0
+    const supportEmbeddings = this.props.supportSet.map((x) => x.embedding)
+    const supportLabels = this.props.supportSet.map((x) => x.label)
+    if (supportEmbeddings.length > 0) {
+      const scores = kernel.predict([
+        embedding.tile([supportEmbeddings.length, 1]),
+        tf.concat(supportEmbeddings),
+      ])
+      confidence = scores.max().dataSync()[0]
+      index = scores.argMax().dataSync()[0]
+      label = supportLabels[index]
+    }
+    return {embedding, label, confidence, index}
+  }
+
+  handleCameraStream = (stream, updatePreview, gl) => {
+    const loop = async () => {
+      if (this.state.isRecording) {
+        let tensor = stream.next().value.reverse(1)
+
+        const prediction = await Promise.all([
+          encodeJpeg(tensor),
+          compressJpeg(tensor, 10).then((t) => this.predict(t)),
+        ]).then((arr) => arr.reduce((x, y) => ({...x, ...y}), {}))
+        updatePreview()
+        tf.dispose([tensor]);
+
+        this.setState({predictions: [...this.state.predictions, prediction]})
+      }
+
+      updatePreview()
+      gl.endFrameEXP();
+
+      this.rafID = requestAnimationFrame(loop);
+    }
+
+    loop();
+  }
+
+  componentWillUnmount() {
+    if (this.rafID) {
+      cancelAnimationFrame(this.rafID);
     }
   }
 
@@ -174,8 +261,10 @@ class CameraScreen extends React.Component {
         </TouchableOpacity>
       </View>
       <View style={styles.bottomBarCenterContainer}>
-        <TouchableOpacity style={styles.bottomBarIcon} onPress={this.takePictureAsync}>
-          <Ionicons name="ios-radio-button-on" size={70} color="white"/>
+        <TouchableOpacity style={styles.bottomBarIcon}
+                          onPressIn={this.onPressRadioIn}
+                          onPressOut={this.onPressRadioOut}>
+          <Ionicons name="ios-radio-button-on" size={70} color={this.state.isRecording ? "red" : "white"}/>
         </TouchableOpacity>
       </View>
       <View style={styles.bottomBarSideContainer}/>
@@ -183,8 +272,9 @@ class CameraScreen extends React.Component {
 
   renderCamera = () =>
     (
-      <View style={{flex: 1}}>
-        <Camera
+      <View style={styles.cameraView}>
+        {this.renderTopBar()}
+        <TensorCamera
           ref={ref => {
             this.camera = ref
           }}
@@ -195,10 +285,16 @@ class CameraScreen extends React.Component {
           zoom={this.state.zoom}
           whiteBalance={this.state.whiteBalance}
           ratio={this.state.ratio}
-        >
-          {this.renderTopBar()}
-          {this.renderBottomBar()}
-        </Camera>
+          // Tensor related props
+          cameraTextureHeight={1920}
+          cameraTextureWidth={1080}
+          resizeHeight={224}
+          resizeWidth={Math.ceil(width * 224 / height)}
+          resizeDepth={3}
+          onReady={this.handleCameraStream}
+          autorender={false}
+        />
+        {this.renderBottomBar()}
       </View>
     );
 
@@ -220,8 +316,12 @@ class CameraScreen extends React.Component {
   }
 }
 
-CameraScreen.propTypes = {
-  handleTakePictureAsync: PropTypes.func.isRequired,
-}
+const mapStateToProps = (state) => ({
+  supportSet: state.supportSet,
+});
 
-export default CameraScreen
+const mapDispatchToProps = (dispatch) => ({
+  updatePrediction: (prediction) => dispatch(updatePrediction(prediction)),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(CameraScreen)
