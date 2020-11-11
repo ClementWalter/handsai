@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, Dimensions, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
 import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
 import { EvilIcons, Ionicons, MaterialIcons } from '@expo/vector-icons';
@@ -128,6 +128,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+const textureDims = Platform.OS === "ios"? { width: 1080, height: 1920 } : { width: 1600, height: 1200 };
 
 class CameraScreen extends React.Component {
   rafID;
@@ -287,8 +289,8 @@ class CameraScreen extends React.Component {
           whiteBalance={this.state.whiteBalance}
           ratio={this.state.ratio}
           // Tensor related props
-          cameraTextureHeight={1920}
-          cameraTextureWidth={1080}
+          cameraTextureHeight={textureDims.height}
+          cameraTextureWidth={textureDims.width}
           resizeHeight={224}
           resizeWidth={Math.ceil(width * 224 / height)}
           resizeDepth={3}
