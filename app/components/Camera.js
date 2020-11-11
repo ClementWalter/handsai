@@ -1,17 +1,12 @@
 import React from 'react';
-import { Button, Dimensions, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
+import { Button, Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
 import { EvilIcons, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import * as tf from "@tensorflow/tfjs"
 import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
-import preprocessing from '../models/preprocessing';
-import encoder from '../models/encoder';
-import kernel from '../models/kernel';
 import { connect } from 'react-redux';
-import { updatePrediction } from '../actions/predictionActions';
-import { compressJpeg, encodeJpeg } from '../utils/tensorUtils';
+import { requestPrediction } from '../actions/predictionActions';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
@@ -144,7 +139,6 @@ class CameraScreen extends React.Component {
     ratio: '16:9',
     cameraPermissionsGranted: false,
     cameraRollPermissionsGranted: false,
-    predictions: [],
   };
 
   allowCameraPermission = async () => {
@@ -178,8 +172,6 @@ class CameraScreen extends React.Component {
 
   onPressRadioOut = () => {
     this.isRecording = false;
-    this.props.updatePrediction({predictions: this.state.predictions})
-    this.setState({predictions: []});
     this.props.toggleModal()
   }
 
@@ -191,37 +183,11 @@ class CameraScreen extends React.Component {
     }
   }
 
-  predict = (tensor) => {
-    const embedding = encoder.predict(preprocessing.predict(tensor))
-    let confidence = 0
-    let label = "NO_LABEL"
-    let index = 0
-    const supportEmbeddings = this.props.supportSet.map((x) => x.embedding)
-    const supportLabels = this.props.supportSet.map((x) => x.label)
-    if (supportEmbeddings.length > 0) {
-      const scores = kernel.predict([
-        embedding.tile([supportEmbeddings.length, 1]),
-        tf.concat(supportEmbeddings),
-      ])
-      confidence = scores.max().dataSync()[0]
-      index = scores.argMax().dataSync()[0]
-      label = supportLabels[index]
-    }
-    return {embedding, label, confidence, index}
-  }
-
   handleCameraStream = (stream) => {
-    const loop = async () => {
+    const loop = () => {
       if (this.isRecording) {
-        let tensor = stream.next().value.reverse(1)
-
-        const prediction = await Promise.all([
-          encodeJpeg(tensor),
-          compressJpeg(tensor, 10).then((t) => this.predict(t)),
-        ]).then((arr) => arr.reduce((x, y) => ({...x, ...y}), {}))
-        tf.dispose([tensor]);
-
-        this.setState({predictions: [...this.state.predictions, prediction]})
+        const tensor = stream.next().value.reverse(1)
+        this.props.requestPrediction(tensor, this.props.supportSet)
       }
 
       this.rafID = requestAnimationFrame(loop);
@@ -320,7 +286,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  updatePrediction: (prediction) => dispatch(updatePrediction(prediction)),
+  requestPrediction: (tensor, supportSet) => dispatch(requestPrediction(tensor, supportSet)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(CameraScreen)
