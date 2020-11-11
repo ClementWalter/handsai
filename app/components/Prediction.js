@@ -84,8 +84,8 @@ class Prediction extends React.Component {
   onLabelReject = () => this.labelInput.focus();
 
   onLabelAccept = () => {
-    this.props.toggleModal()
     this.props.validatePrediction(this.props.prediction);
+    this.props.toggleModal()
   }
 
   renderTopBar = () => {

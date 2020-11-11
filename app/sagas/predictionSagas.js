@@ -35,7 +35,6 @@ export function* watchRequestPrediction() {
 }
 
 function* validatePrediction(action) {
-  yield put(clearPrediction())
   yield put(savePrediction(action.prediction))
 }
 

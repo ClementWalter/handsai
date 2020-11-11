@@ -27,20 +27,16 @@ class Home extends React.Component {
     this.props.updatePrediction({images})
   };
 
-  onSwipeComplete = async () => {
-    await this.toggleModal()
-    this.props.clearPrediction();
-  }
-
   render() {
     return (
       <View style={styles.container}>
         <Camera openImagePickerAsync={this.openImagePickerAsync} toggleModal={this.toggleModal}/>
         <Modal isVisible={this.state.isModalVisible}
-               onSwipeComplete={this.onSwipeComplete}
+               onSwipeComplete={this.toggleModal}
                style={styles.modal}
                backdropOpacity={1}
                swipeDirection={["up", "down"]}
+               onModalHide={this.props.clearPrediction}
         >
           <Prediction toggleModal={this.toggleModal}/>
         </Modal>
