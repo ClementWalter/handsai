@@ -210,7 +210,7 @@ class CameraScreen extends React.Component {
     return {embedding, label, confidence, index}
   }
 
-  handleCameraStream = (stream, updatePreview, gl) => {
+  handleCameraStream = (stream) => {
     const loop = async () => {
       if (this.isRecording) {
         let tensor = stream.next().value.reverse(1)
@@ -219,14 +219,10 @@ class CameraScreen extends React.Component {
           encodeJpeg(tensor),
           compressJpeg(tensor, 10).then((t) => this.predict(t)),
         ]).then((arr) => arr.reduce((x, y) => ({...x, ...y}), {}))
-        updatePreview()
         tf.dispose([tensor]);
 
         this.setState({predictions: [...this.state.predictions, prediction]})
       }
-
-      updatePreview()
-      gl.endFrameEXP();
 
       this.rafID = requestAnimationFrame(loop);
     }
@@ -295,7 +291,7 @@ class CameraScreen extends React.Component {
           resizeWidth={Math.ceil(width * 224 / height)}
           resizeDepth={3}
           onReady={this.handleCameraStream}
-          autorender={false}
+          autorender={true}
         />
         {this.renderBottomBar()}
       </View>
