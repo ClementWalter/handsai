@@ -4,7 +4,7 @@ import Modal from 'react-native-modal';
 import Prediction from './Prediction';
 import Camera from './Camera';
 import { connect } from 'react-redux';
-import { clearPrediction, updatePrediction } from '../actions/predictionActions';
+import { clearPrediction } from '../actions/predictionActions';
 
 const styles = StyleSheet.create({
   container: {
@@ -23,14 +23,10 @@ class Home extends React.Component {
 
   toggleModal = () => this.setState({isModalVisible: !this.state.isModalVisible})
 
-  openImagePickerAsync = (images) => {
-    this.props.updatePrediction({images})
-  };
-
   render() {
     return (
       <View style={styles.container}>
-        <Camera openImagePickerAsync={this.openImagePickerAsync} toggleModal={this.toggleModal}/>
+        <Camera toggleModal={this.toggleModal}/>
         <Modal isVisible={this.state.isModalVisible}
                onSwipeComplete={this.toggleModal}
                style={styles.modal}
@@ -45,14 +41,8 @@ class Home extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => ({
-    prediction: state.prediction,
-  })
-;
-
 const mapDispatchToProps = (dispatch) => ({
   clearPrediction: () => dispatch(clearPrediction()),
-  updatePrediction: (prediction) => dispatch(updatePrediction(prediction)),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Home)
+export default connect(null, mapDispatchToProps)(Home)

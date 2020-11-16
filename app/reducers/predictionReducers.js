@@ -3,7 +3,7 @@ const predictionReducers = (state = {}, action) => {
     case 'UPDATE_PREDICTION': {
       return {
         ...state,
-        ...action.prediction
+        predictions: state.predictions.map((prediction) => ({...prediction, label: action.label})),
       }
     }
     case 'CLEAR_PREDICTION': {
@@ -12,7 +12,7 @@ const predictionReducers = (state = {}, action) => {
     case 'ADD_PREDICTION': {
       return {
         ...state,
-        predictions: [...(state.predictions || []), action.prediction]
+        predictions: [...(state.predictions || []), action.prediction],
       }
     }
     default: {

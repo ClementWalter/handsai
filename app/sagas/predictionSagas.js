@@ -26,8 +26,9 @@ const predict = (tensor, supportSet) => {
 }
 
 function* requestPrediction(action) {
+  let insureJpeg = () => action.photo ? action.photo : encodeJpeg(action.tensor)
   const prediction = yield Promise.all([
-    encodeJpeg(action.tensor),
+    insureJpeg(),
     compressJpeg(action.tensor, 10).then((t) => predict(t, action.supportSet)),
   ]).then((arr) => arr.reduce((x, y) => ({...x, ...y}), {}))
   tf.dispose([action.tensor]);

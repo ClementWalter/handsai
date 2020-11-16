@@ -7,6 +7,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
 import { connect } from 'react-redux';
 import { requestPrediction } from '../actions/predictionActions';
+import { loadUri } from '../utils/tensorUtils';
+import { resize } from '../utils/imageUtils';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
@@ -79,7 +81,7 @@ const styles = StyleSheet.create({
   topBar: {
     position: 'absolute',
     left: 0,
-    top: 0,
+    top: 15,
     width: "100%",
     height: Math.floor(0.2 * height),
     zIndex: 20,
@@ -124,11 +126,11 @@ const styles = StyleSheet.create({
   },
 });
 
-const textureDims = Platform.OS === "ios"? { width: 1080, height: 1920 } : { width: 1600, height: 1200 };
+const textureDims = Platform.OS === "ios" ? {width: 1080, height: 1920} : {width: 1600, height: 1200};
 
 class CameraScreen extends React.Component {
   rafID;
-  isRecording=false;
+  isRecording = false;
 
   state = {
     flash: 'off',
@@ -168,7 +170,9 @@ class CameraScreen extends React.Component {
 
   toggleFocus = () => this.setState({autoFocus: this.state.autoFocus === 'on' ? 'off' : 'on'});
 
-  onPressRadioIn = () => {this.isRecording = true};
+  onPressRadioIn = () => {
+    this.isRecording = true
+  };
 
   onPressRadioOut = () => {
     this.isRecording = false;
@@ -179,7 +183,10 @@ class CameraScreen extends React.Component {
     await this.allowCameraRollPermission();
     const photo = await ImagePicker.launchImageLibraryAsync({allowsEditing: false});
     if (!photo.cancelled) {
-      this.props.openImagePickerAsync(photo)
+      const photoLow = await resize(224, 224, {base64: false})(photo)
+      const tensor = await loadUri(photoLow.uri)
+      this.props.requestPrediction(tensor, this.props.supportSet, photoLow)
+      this.props.toggleModal()
     }
   }
 
@@ -286,7 +293,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  requestPrediction: (tensor, supportSet) => dispatch(requestPrediction(tensor, supportSet)),
+  requestPrediction: (tensor, supportSet, photo) => dispatch(requestPrediction(tensor, supportSet, photo)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(CameraScreen)

@@ -10,9 +10,8 @@ import {
   View,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { updatePrediction, savePrediction } from '../actions/predictionActions';
+import { savePrediction, updatePrediction } from '../actions/predictionActions';
 import { connect } from 'react-redux';
-import isEmpty from 'lodash/isEmpty';
 import { ProgressBar } from 'react-native-paper';
 
 const width = Dimensions.get('window').width;
@@ -71,16 +70,6 @@ const styles = StyleSheet.create({
 
 class Prediction extends React.Component {
 
-  async componentDidMount() {
-    if (this.props.prediction && !!this.props.prediction.predictions) {
-      this.props.updatePrediction({
-        label: this.props.prediction.predictions[0].label,
-        confidence: this.props.prediction.predictions[0].confidence,
-        uri: this.props.prediction.predictions[0].uri,
-      })
-    }
-  }
-
   onLabelReject = () => this.labelInput.focus();
 
   onLabelAccept = () => {
@@ -88,18 +77,18 @@ class Prediction extends React.Component {
     this.props.toggleModal()
   }
 
-  renderTopBar = () => {
+  renderTopBar = (label, confidence) => {
     return <View style={styles.topBar}>
-      {this.renderLabel()}
-      {this.renderConfidence()}
+      {(typeof label === "string") && this.renderLabel(label)}
+      {this.renderConfidence(confidence)}
     </View>;
   }
 
-  onLabelChange = (label) => this.props.updatePrediction({label})
+  onLabelChange = (label) => this.props.updatePrediction(label)
 
-  renderLabel = () => <View style={styles.labelBar}>
+  renderLabel = (label) => <View style={styles.labelBar}>
     <TextInput
-      value={this.props.prediction.label}
+      value={label}
       onChangeText={this.onLabelChange}
       selectTextOnFocus={true}
       style={styles.labelText}
@@ -109,8 +98,7 @@ class Prediction extends React.Component {
     />
   </View>
 
-  renderConfidence = () => {
-    const confidence = this.props.prediction.confidence || 0;
+  renderConfidence = (confidence) => {
     const backgroundColor = confidence < 0.5 ? "red" : confidence < 0.75 ? "yellow" : "green"
     return <View style={styles.confidenceContainer}>
       <ProgressBar
@@ -138,11 +126,15 @@ class Prediction extends React.Component {
     </View>;
 
   render() {
-    const source = isEmpty(this.props.prediction) ? require('../assets/images/splash.png') : {uri: this.props.prediction.uri}
+    const {predictions} = {...this.props.prediction}
+    let label = !!predictions && predictions[0].label
+    const confidence = !!predictions && predictions[0].confidence || 0
+    const uri = !!predictions && predictions[0].uri
+    const source = uri ? {uri} : require('../assets/images/splash.png')
     return <View style={{flex: 1}}>
       <ImageBackground style={styles.background} imageStyle={styles.imageStyle} source={source}>
-        {this.renderTopBar()}
-        {!!this.props.prediction.label ? this.renderBottomBar() :
+        {this.renderTopBar(label, confidence)}
+        {!!predictions ? this.renderBottomBar() :
          <View style={styles.loader}><ActivityIndicator size="large" color="white"/></View>}
       </ImageBackground>
     </View>;
@@ -164,7 +156,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  updatePrediction: (prediction) => dispatch(updatePrediction(prediction)),
+  updatePrediction: (label) => dispatch(updatePrediction(label)),
   savePrediction: (prediction) => dispatch(savePrediction(prediction)),
 })
 

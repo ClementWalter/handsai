@@ -1,4 +1,4 @@
-export const updatePrediction = (prediction) => ({type: 'UPDATE_PREDICTION', prediction})
+export const updatePrediction = (label) => ({type: 'UPDATE_PREDICTION', label})
 
 export const savePrediction = (prediction) => ({
   type: 'SAVE_PREDICTION',
@@ -14,8 +14,9 @@ export const clearPrediction = () => ({
   type: 'CLEAR_PREDICTION',
 })
 
-export const requestPrediction = (tensor, supportSet) => ({
+export const requestPrediction = (tensor, supportSet, photo) => ({
   type: 'REQUEST_PREDICTION',
   tensor,
   supportSet,
+  photo,
 })

@@ -5,7 +5,7 @@ const supportSetReducers = (state = initialState, action) => {
     case 'SAVE_PREDICTION': {
       return [
         ...state,
-        ...action.prediction.predictions.map((prediction) => ({...prediction, label: action.prediction.label})),
+        ...action.prediction.predictions,
       ];
     }
     default: {
