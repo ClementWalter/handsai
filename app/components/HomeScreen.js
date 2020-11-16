@@ -26,7 +26,7 @@ class Home extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Camera toggleModal={this.toggleModal} swiper={this.props.swiperGallery}/>
+        <Camera toggleModal={this.toggleModal} swiper={this.props.swiper}/>
         <Modal isVisible={this.state.isModalVisible}
                onSwipeComplete={this.toggleModal}
                style={styles.modal}

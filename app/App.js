@@ -21,8 +21,9 @@ export default class App extends React.Component {
     isLoadingComplete: false,
   };
 
-  swipeCamera = () => {this.swiper.scrollBy(0, true)}
-  swipeGallery = () => {this.swiper.scrollBy(1, true)}
+  scrollBy = (i) => () => {
+    this.swiper.scrollBy(i, true)
+  }
 
   render() {
     if (!this.state.isLoadingComplete) {
@@ -40,10 +41,10 @@ export default class App extends React.Component {
             this.swiper = swiper
           }}>
             <View style={styles.container}>
-              <HomeScreen swiperCamera={this.swipeCamera} swiperGallery={this.swipeGallery}/>
+              <HomeScreen swiper={this.scrollBy(1)}/>
             </View>
             <View style={styles.container}>
-              <Gallery/>
+              <Gallery swiper={this.scrollBy(0)}/>
             </View>
           </Swiper>
         </Provider>
