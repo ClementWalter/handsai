@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
-import { EvilIcons, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { EvilIcons, Ionicons, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
 import { connect } from 'react-redux';
@@ -15,18 +15,14 @@ const height = Dimensions.get('window').height;
 
 const TensorCamera = cameraWithTensors(Camera)
 
-const flashModeOrder = {
-  off: 'on',
-  on: 'auto',
-  auto: 'torch',
-  torch: 'off',
+const qualityOrder = {
+  low: 'high',
+  high: 'low',
 };
 
-const flashIcons = {
-  off: 'flash-off',
-  on: 'flash-on',
-  auto: 'flash-auto',
-  torch: 'highlight',
+const qualityIcons = {
+  low: 'quality-low',
+  high: 'quality-high',
 };
 
 const wbOrder = {
@@ -120,10 +116,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  autoFocusLabel: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
 });
 
 const textureDims = Platform.OS === "ios" ? {width: 1080, height: 1920} : {width: 1600, height: 1200};
@@ -133,9 +125,8 @@ class CameraScreen extends React.Component {
   isRecording = false;
 
   state = {
-    flash: 'off',
+    quality: 'low',
     zoom: 0,
-    autoFocus: 'on',
     type: 'back',
     whiteBalance: 'auto',
     ratio: '16:9',
@@ -164,11 +155,13 @@ class CameraScreen extends React.Component {
 
   toggleFacing = () => this.setState({type: this.state.type === 'back' ? 'front' : 'back'});
 
-  toggleFlash = () => this.setState({flash: flashModeOrder[this.state.flash]});
+  toggleQuality = () => this.setState({quality: qualityOrder[this.state.quality]});
 
   toggleWB = () => this.setState({whiteBalance: wbOrder[this.state.whiteBalance]});
 
-  toggleFocus = () => this.setState({autoFocus: this.state.autoFocus === 'on' ? 'off' : 'on'});
+  toggleFocus = () => {
+    this.props.swiper()
+  }
 
   onPressRadioIn = () => {
     this.isRecording = true
@@ -214,14 +207,11 @@ class CameraScreen extends React.Component {
       <TouchableOpacity style={styles.toggleButton} onPress={this.toggleFacing}>
         <Ionicons name="ios-reverse-camera" size={32} color="white"/>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.toggleButton} onPress={this.toggleFlash}>
-        <MaterialIcons name={flashIcons[this.state.flash]} size={32} color="white"/>
-      </TouchableOpacity>
       <TouchableOpacity style={styles.toggleButton} onPress={this.toggleWB}>
         <MaterialIcons name={wbIcons[this.state.whiteBalance]} size={32} color="white"/>
       </TouchableOpacity>
       <TouchableOpacity style={styles.toggleButton} onPress={this.toggleFocus}>
-        <Text style={[styles.autoFocusLabel, {color: this.state.autoFocus === 'on' ? "white" : "#6b6b6b"}]}>AF</Text>
+        <Ionicons name="ios-images" size={32} color="white" />
       </TouchableOpacity>
     </View>;
 
@@ -242,8 +232,10 @@ class CameraScreen extends React.Component {
       <View style={styles.bottomBarSideContainer}/>
     </View>;
 
-  renderCamera = () =>
-    (
+  renderCamera = () => {
+    const resizeHeight = this.state.quality === "high" ? Math.ceil(height / width * 224) : 224
+    const resizeWidth = this.state.quality === "high" ? 224 : Math.ceil( width / height * 224)
+    return (
       <View style={styles.cameraView}>
         {this.renderTopBar()}
         <TensorCamera
@@ -252,7 +244,6 @@ class CameraScreen extends React.Component {
           }}
           style={styles.camera}
           type={this.state.type}
-          flashMode={this.state.flash}
           autoFocus={this.state.autoFocus}
           zoom={this.state.zoom}
           whiteBalance={this.state.whiteBalance}
@@ -260,8 +251,8 @@ class CameraScreen extends React.Component {
           // Tensor related props
           cameraTextureHeight={textureDims.height}
           cameraTextureWidth={textureDims.width}
-          resizeHeight={224}
-          resizeWidth={Math.ceil(width * 224 / height)}
+          resizeHeight={resizeHeight}
+          resizeWidth={resizeWidth}
           resizeDepth={3}
           onReady={this.handleCameraStream}
           autorender={true}
@@ -269,6 +260,7 @@ class CameraScreen extends React.Component {
         {this.renderBottomBar()}
       </View>
     );
+  }
 
   renderNoPermissions = () =>
     <View style={styles.noPermissions}>

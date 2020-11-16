@@ -21,6 +21,9 @@ export default class App extends React.Component {
     isLoadingComplete: false,
   };
 
+  swipeCamera = () => {this.swiper.scrollBy(0, true)}
+  swipeGallery = () => {this.swiper.scrollBy(1, true)}
+
   render() {
     if (!this.state.isLoadingComplete) {
       return (
@@ -33,9 +36,11 @@ export default class App extends React.Component {
     } else {
       return (
         <Provider store={store}>
-          <Swiper loop={false} showsPagination={false}>
+          <Swiper loop={false} showsPagination={false} ref={(swiper) => {
+            this.swiper = swiper
+          }}>
             <View style={styles.container}>
-              <HomeScreen/>
+              <HomeScreen swiperCamera={this.swipeCamera} swiperGallery={this.swipeGallery}/>
             </View>
             <View style={styles.container}>
               <Gallery/>
@@ -55,6 +60,7 @@ export default class App extends React.Component {
       Font.loadAsync({
         // This is the font that we are using for our tab bar
         ...Icon.MaterialIcons.font,
+        ...Icon.MaterialCommunityIcons.font,
         ...Icon.FontAwesome.font,
         ...Icon.Feather.font,
         ...Icon.EvilIcons.font,
