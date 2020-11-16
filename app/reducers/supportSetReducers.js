@@ -1,12 +1,12 @@
-const initialState = {};
+const initialState = [];
 
 const supportSetReducers = (state = initialState, action) => {
   switch (action.type) {
     case 'SAVE_PREDICTION': {
-      return {
+      return [
         ...state,
-        [action.prediction.photo.uri]: action.prediction,
-      };
+        ...action.prediction.predictions,
+      ];
     }
     default: {
       return state;

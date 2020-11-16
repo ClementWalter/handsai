@@ -2,10 +2,9 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Modal from 'react-native-modal';
 import Prediction from './Prediction';
-import isEmpty from 'lodash/isEmpty';
 import Camera from './Camera';
 import { connect } from 'react-redux';
-import { clearPrediction, updatePrediction } from '../actions/predictionActions';
+import { clearPrediction } from '../actions/predictionActions';
 
 const styles = StyleSheet.create({
   container: {
@@ -18,35 +17,32 @@ const styles = StyleSheet.create({
 
 class Home extends React.Component {
 
-  handleTakePictureAsync = (photo) => this.props.updatePrediction({photo})
+  state = {
+    isModalVisible: false,
+  }
 
-  onSwipeComplete = () => this.props.clearPrediction();
+  toggleModal = () => this.setState({isModalVisible: !this.state.isModalVisible})
 
   render() {
     return (
       <View style={styles.container}>
-        <Camera handleTakePictureAsync={this.handleTakePictureAsync}/>
-        <Modal isVisible={!isEmpty(this.props.prediction)}
-               onSwipeComplete={this.onSwipeComplete}
+        <Camera toggleModal={this.toggleModal} swiper={this.props.swiper}/>
+        <Modal isVisible={this.state.isModalVisible}
+               onSwipeComplete={this.toggleModal}
                style={styles.modal}
                backdropOpacity={1}
-               swipeDirection="up"
+               swipeDirection={["up", "down"]}
+               onModalHide={this.props.clearPrediction}
         >
-          <Prediction/>
+          <Prediction toggleModal={this.toggleModal}/>
         </Modal>
       </View>
     )
   }
 }
 
-const mapStateToProps = (state) => ({
-    prediction: state.prediction,
-  })
-;
-
 const mapDispatchToProps = (dispatch) => ({
   clearPrediction: () => dispatch(clearPrediction()),
-  updatePrediction: (prediction) => dispatch(updatePrediction(prediction)),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Home)
+export default connect(null, mapDispatchToProps)(Home)

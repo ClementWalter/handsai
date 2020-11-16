@@ -13,13 +13,17 @@ import { Provider } from 'react-redux';
 
 import { store } from './store/store';
 import preprocessing from './models/preprocessing'
-import encoder from './models/encoder'
+import encoder from './models/encoder';
 import kernel from './models/kernel';
 
 export default class App extends React.Component {
   state = {
     isLoadingComplete: false,
   };
+
+  scrollBy = (i) => () => {
+    this.swiper.scrollBy(i, true)
+  }
 
   render() {
     if (!this.state.isLoadingComplete) {
@@ -33,12 +37,14 @@ export default class App extends React.Component {
     } else {
       return (
         <Provider store={store}>
-          <Swiper loop={false} showsPagination={false}>
+          <Swiper loop={false} showsPagination={false} ref={(swiper) => {
+            this.swiper = swiper
+          }}>
             <View style={styles.container}>
-              <HomeScreen/>
+              <HomeScreen swiper={this.scrollBy(1)}/>
             </View>
             <View style={styles.container}>
-              <Gallery/>
+              <Gallery swiper={this.scrollBy(0)}/>
             </View>
           </Swiper>
         </Provider>
@@ -55,9 +61,11 @@ export default class App extends React.Component {
       Font.loadAsync({
         // This is the font that we are using for our tab bar
         ...Icon.MaterialIcons.font,
+        ...Icon.MaterialCommunityIcons.font,
         ...Icon.FontAwesome.font,
         ...Icon.Feather.font,
         ...Icon.EvilIcons.font,
+        ...Icon.Ionicons.font,
       }),
       tf.ready(),
     ])

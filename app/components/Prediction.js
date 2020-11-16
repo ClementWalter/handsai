@@ -10,12 +10,12 @@ import {
   View,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { requestPrediction, updatePrediction, validatePrediction } from '../actions/predictionActions';
+import { savePrediction, updatePrediction } from '../actions/predictionActions';
 import { connect } from 'react-redux';
-import isEmpty from 'lodash/isEmpty';
 import { ProgressBar } from 'react-native-paper';
 
 const width = Dimensions.get('window').width;
+
 const styles = StyleSheet.create({
   background: {
     flex: 1,
@@ -70,26 +70,25 @@ const styles = StyleSheet.create({
 
 class Prediction extends React.Component {
 
-  async componentDidMount() {
-    this.props.requestPrediction(this.props.prediction, this.props.supportSet)
-  }
-
   onLabelReject = () => this.labelInput.focus();
 
-  onLabelAccept = () => this.props.validatePrediction(this.props.prediction);
+  onLabelAccept = () => {
+    this.props.savePrediction(this.props.prediction);
+    this.props.toggleModal()
+  }
 
-  renderTopBar = () => {
+  renderTopBar = (label, confidence) => {
     return <View style={styles.topBar}>
-      {this.renderLabel()}
-      {this.renderConfidence()}
+      {(typeof label === "string") && this.renderLabel(label)}
+      {this.renderConfidence(confidence)}
     </View>;
   }
 
-  onLabelChange = (label) => this.props.updatePrediction({label})
+  onLabelChange = (label) => this.props.updatePrediction(label)
 
-  renderLabel = () => <View style={styles.labelBar}>
+  renderLabel = (label) => <View style={styles.labelBar}>
     <TextInput
-      value={this.props.prediction && this.props.prediction.label}
+      value={label}
       onChangeText={this.onLabelChange}
       selectTextOnFocus={true}
       style={styles.labelText}
@@ -99,8 +98,7 @@ class Prediction extends React.Component {
     />
   </View>
 
-  renderConfidence = () => {
-    const confidence = this.props.prediction ? this.props.prediction.confidence : 0;
+  renderConfidence = (confidence) => {
     const backgroundColor = confidence < 0.5 ? "red" : confidence < 0.75 ? "yellow" : "green"
     return <View style={styles.confidenceContainer}>
       <ProgressBar
@@ -128,11 +126,15 @@ class Prediction extends React.Component {
     </View>;
 
   render() {
-    const source = isEmpty(this.props.prediction) ? require('../assets/images/splash.png') : {uri: this.props.prediction.photo.uri}
+    const {predictions} = {...this.props.prediction}
+    let label = !!predictions && predictions[0].label
+    const confidence = !!predictions && predictions[0].confidence || 0
+    const uri = !!predictions && predictions[0].uri
+    const source = uri ? {uri} : require('../assets/images/splash.png')
     return <View style={{flex: 1}}>
       <ImageBackground style={styles.background} imageStyle={styles.imageStyle} source={source}>
-        {this.renderTopBar()}
-        {!!this.props.prediction.label ? this.renderBottomBar() :
+        {this.renderTopBar(label, confidence)}
+        {!!predictions ? this.renderBottomBar() :
          <View style={styles.loader}><ActivityIndicator size="large" color="white"/></View>}
       </ImageBackground>
     </View>;
@@ -141,23 +143,21 @@ class Prediction extends React.Component {
 
 Prediction.propTypes = {
   prediction: PropTypes.shape({
-    photo: PropTypes.object,
+    predictions: PropTypes.array,
     label: PropTypes.string,
     confidence: PropTypes.number,
+    uri: PropTypes.string,
   }),
-  supportSet: PropTypes.object,
+  toggleModal: PropTypes.func,
 }
 
 const mapStateToProps = (state) => ({
-    prediction: state.prediction,
-    supportSet: state.supportSet,
-  })
-;
+  prediction: state.prediction,
+});
 
 const mapDispatchToProps = (dispatch) => ({
-  requestPrediction: (prediction, supportSet) => dispatch(requestPrediction(prediction, supportSet)),
-  updatePrediction: (prediction) => dispatch(updatePrediction(prediction)),
-  validatePrediction: (prediction) => dispatch(validatePrediction(prediction)),
+  updatePrediction: (label) => dispatch(updatePrediction(label)),
+  savePrediction: (prediction) => dispatch(savePrediction(prediction)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Prediction)

@@ -1,23 +1,28 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
-import { EvilIcons, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { EvilIcons, Ionicons, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
+import { connect } from 'react-redux';
+import { requestPrediction } from '../actions/predictionActions';
+import { loadUri } from '../utils/tensorUtils';
+import { resize } from '../utils/imageUtils';
 
-const flashModeOrder = {
-  off: 'on',
-  on: 'auto',
-  auto: 'torch',
-  torch: 'off',
+const width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
+
+const TensorCamera = cameraWithTensors(Camera)
+
+const qualityOrder = {
+  low: 'high',
+  high: 'low',
 };
 
-const flashIcons = {
-  off: 'flash-off',
-  on: 'flash-on',
-  auto: 'flash-auto',
-  torch: 'highlight',
+const qualityIcons = {
+  low: 'quality-low',
+  high: 'quality-high',
 };
 
 const wbOrder = {
@@ -53,18 +58,40 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: 'white',
   },
+  cameraView: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+  },
   camera: {
-    flex: 1,
-    justifyContent: 'space-between',
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    width,
+    height,
+    zIndex: 0,
   },
   topBar: {
-    flex: 0.2,
+    position: 'absolute',
+    left: 0,
+    top: 15,
+    width: "100%",
+    height: Math.floor(0.2 * height),
+    zIndex: 20,
     backgroundColor: 'transparent',
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
   bottomBar: {
-    flex: 0.2,
+    position: 'absolute',
+    left: 0,
+    bottom: 0,
+    width: "100%",
+    height: Math.floor(0.2 * height),
+    zIndex: 20,
     backgroundColor: 'transparent',
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -89,21 +116,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  autoFocusLabel: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
 });
 
+const textureDims = Platform.OS === "ios" ? {width: 1080, height: 1920} : {width: 1600, height: 1200};
+
 class CameraScreen extends React.Component {
+  rafID;
+  isRecording = false;
+
   state = {
-    flash: 'off',
+    quality: 'low',
     zoom: 0,
-    autoFocus: 'on',
     type: 'back',
     whiteBalance: 'auto',
     ratio: '16:9',
-    ratios: [],
     cameraPermissionsGranted: false,
     cameraRollPermissionsGranted: false,
   };
@@ -129,24 +155,50 @@ class CameraScreen extends React.Component {
 
   toggleFacing = () => this.setState({type: this.state.type === 'back' ? 'front' : 'back'});
 
-  toggleFlash = () => this.setState({flash: flashModeOrder[this.state.flash]});
+  toggleQuality = () => this.setState({quality: qualityOrder[this.state.quality]});
 
   toggleWB = () => this.setState({whiteBalance: wbOrder[this.state.whiteBalance]});
 
-  toggleFocus = () => this.setState({autoFocus: this.state.autoFocus === 'on' ? 'off' : 'on'});
+  toggleFocus = () => {
+    this.props.swiper()
+  }
 
-  takePictureAsync = async () => {
-    if (this.camera) {
-      const photo = await this.camera.takePictureAsync({quality: 0});
-      this.props.handleTakePictureAsync(photo)
-    }
+  onPressRadioIn = () => {
+    this.isRecording = true
   };
+
+  onPressRadioOut = () => {
+    this.isRecording = false;
+    this.props.toggleModal()
+  }
 
   openImagePickerAsync = async () => {
     await this.allowCameraRollPermission();
     const photo = await ImagePicker.launchImageLibraryAsync({allowsEditing: false});
     if (!photo.cancelled) {
-      this.props.handleTakePictureAsync(photo)
+      const photoLow = await resize(224, 224, {base64: false})(photo)
+      const tensor = await loadUri(photoLow.uri)
+      this.props.requestPrediction(tensor, this.props.supportSet, photoLow)
+      this.props.toggleModal()
+    }
+  }
+
+  handleCameraStream = (stream) => {
+    const loop = () => {
+      if (this.isRecording) {
+        const tensor = stream.next().value.reverse(1)
+        this.props.requestPrediction(tensor, this.props.supportSet)
+      }
+
+      this.rafID = requestAnimationFrame(loop);
+    }
+
+    loop();
+  }
+
+  componentWillUnmount() {
+    if (this.rafID) {
+      cancelAnimationFrame(this.rafID);
     }
   }
 
@@ -155,14 +207,11 @@ class CameraScreen extends React.Component {
       <TouchableOpacity style={styles.toggleButton} onPress={this.toggleFacing}>
         <Ionicons name="ios-reverse-camera" size={32} color="white"/>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.toggleButton} onPress={this.toggleFlash}>
-        <MaterialIcons name={flashIcons[this.state.flash]} size={32} color="white"/>
-      </TouchableOpacity>
       <TouchableOpacity style={styles.toggleButton} onPress={this.toggleWB}>
         <MaterialIcons name={wbIcons[this.state.whiteBalance]} size={32} color="white"/>
       </TouchableOpacity>
       <TouchableOpacity style={styles.toggleButton} onPress={this.toggleFocus}>
-        <Text style={[styles.autoFocusLabel, {color: this.state.autoFocus === 'on' ? "white" : "#6b6b6b"}]}>AF</Text>
+        <Ionicons name="ios-images" size={32} color="white" />
       </TouchableOpacity>
     </View>;
 
@@ -174,33 +223,44 @@ class CameraScreen extends React.Component {
         </TouchableOpacity>
       </View>
       <View style={styles.bottomBarCenterContainer}>
-        <TouchableOpacity style={styles.bottomBarIcon} onPress={this.takePictureAsync}>
-          <Ionicons name="ios-radio-button-on" size={70} color="white"/>
+        <TouchableOpacity style={styles.bottomBarIcon}
+                          onPressIn={this.onPressRadioIn}
+                          onPressOut={this.onPressRadioOut}>
+          <Ionicons name="ios-radio-button-on" size={70} color={this.isRecording ? "red" : "white"}/>
         </TouchableOpacity>
       </View>
       <View style={styles.bottomBarSideContainer}/>
     </View>;
 
-  renderCamera = () =>
-    (
-      <View style={{flex: 1}}>
-        <Camera
+  renderCamera = () => {
+    const resizeHeight = this.state.quality === "high" ? Math.ceil(height / width * 224) : 224
+    const resizeWidth = this.state.quality === "high" ? 224 : Math.ceil( width / height * 224)
+    return (
+      <View style={styles.cameraView}>
+        {this.renderTopBar()}
+        <TensorCamera
           ref={ref => {
             this.camera = ref
           }}
           style={styles.camera}
           type={this.state.type}
-          flashMode={this.state.flash}
           autoFocus={this.state.autoFocus}
           zoom={this.state.zoom}
           whiteBalance={this.state.whiteBalance}
           ratio={this.state.ratio}
-        >
-          {this.renderTopBar()}
-          {this.renderBottomBar()}
-        </Camera>
+          // Tensor related props
+          cameraTextureHeight={textureDims.height}
+          cameraTextureWidth={textureDims.width}
+          resizeHeight={resizeHeight}
+          resizeWidth={resizeWidth}
+          resizeDepth={3}
+          onReady={this.handleCameraStream}
+          autorender={true}
+        />
+        {this.renderBottomBar()}
       </View>
     );
+  }
 
   renderNoPermissions = () =>
     <View style={styles.noPermissions}>
@@ -220,8 +280,12 @@ class CameraScreen extends React.Component {
   }
 }
 
-CameraScreen.propTypes = {
-  handleTakePictureAsync: PropTypes.func.isRequired,
-}
+const mapStateToProps = (state) => ({
+  supportSet: state.supportSet,
+});
 
-export default CameraScreen
+const mapDispatchToProps = (dispatch) => ({
+  requestPrediction: (tensor, supportSet, photo) => dispatch(requestPrediction(tensor, supportSet, photo)),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(CameraScreen)
