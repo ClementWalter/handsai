@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
-    backgroundColor: '#6E00FF',
+    backgroundColor: '#000000',
   },
   imageStyle: {
     resizeMode: 'contain',

@@ -211,7 +211,7 @@ class CameraScreen extends React.Component {
         <MaterialIcons name={wbIcons[this.state.whiteBalance]} size={32} color="white"/>
       </TouchableOpacity>
       <TouchableOpacity style={styles.toggleButton} onPress={this.toggleFocus}>
-        <Ionicons name="ios-images" size={32} color="white" />
+        <Ionicons name="ios-images" size={32} color="white"/>
       </TouchableOpacity>
     </View>;
 
@@ -233,8 +233,8 @@ class CameraScreen extends React.Component {
     </View>;
 
   renderCamera = () => {
-    const resizeHeight = this.state.quality === "high" ? Math.ceil(height / width * 224) : 224
-    const resizeWidth = this.state.quality === "high" ? 224 : Math.ceil( width / height * 224)
+    const resizeWidth = this.state.quality === "high" ? 224 : Math.round(width / height) * 224
+    const resizeHeight = Math.round(height / width * resizeWidth)
     return (
       <View style={styles.cameraView}>
         {this.renderTopBar()}
