@@ -233,7 +233,7 @@ class CameraScreen extends React.Component {
     </View>;
 
   renderCamera = () => {
-    const resizeWidth = this.state.quality === "high" ? 224 : Math.round(width / height) * 224
+    const resizeWidth = this.state.quality === "high" ? 224 : Math.round(width / height * 224 / 4) * 4
     const resizeHeight = Math.round(height / width * resizeWidth)
     return (
       <View style={styles.cameraView}>
