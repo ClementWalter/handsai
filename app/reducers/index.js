@@ -1,7 +1,7 @@
-import { combineReducers } from 'redux';
+import { combineReducers } from "redux";
 
-import predictionReducers from './predictionReducers';
-import supportSetReducers from './supportSetReducers';
+import predictionReducers from "./predictionReducers";
+import supportSetReducers from "./supportSetReducers";
 
 export default combineReducers({
   prediction: predictionReducers,

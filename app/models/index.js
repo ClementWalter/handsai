@@ -1,31 +1,35 @@
-import * as tf from "@tensorflow/tfjs"
-import { logger } from 'react-native-logs';
+import * as tf from "@tensorflow/tfjs";
+import { logger } from "react-native-logs";
 
 const log = logger.createLogger();
 
-export class MLModel {
-
+export default class MLModel {
   url = null;
-  model = null;
-  token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.e30.D0bEXk5URSfyKHIWKKcfVTaQuP6P0dnjyqmqbS6FlYQ"
 
-  getModel = () => (this.model);
+  model = null;
+
+  token =
+    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.e30.D0bEXk5URSfyKHIWKKcfVTaQuP6P0dnjyqmqbS6FlYQ";
+
+  getModel = () => this.model;
 
   async loadModel() {
-    log.info(`loading model ${this.url}`)
+    log.info(`loading model ${this.url}`);
     const myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${this.token}`);
 
     const requestOptions = {
-      method: 'GET',
+      method: "GET",
       headers: myHeaders,
-      redirect: 'follow',
+      redirect: "follow",
     };
-    this.model = await tf.loadGraphModel(this.url, { requestInit: requestOptions});
-    log.info(`loaded model ${this.url}`)
+    this.model = await tf.loadGraphModel(this.url, {
+      requestInit: requestOptions,
+    });
+    log.info(`loaded model ${this.url}`);
   }
 
-  preprocess = (tensor) => (tensor)
+  preprocess = (tensor) => tensor;
 
-  predict = (tensor) => (this.getModel().predict(this.preprocess(tensor)))
+  predict = (tensor) => this.getModel().predict(this.preprocess(tensor));
 }

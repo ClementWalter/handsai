@@ -1,27 +1,36 @@
-import React from 'react';
-import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Constants from 'expo-constants';
-import Photo from './Photo';
+import React from "react";
+import {
+  Dimensions,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Constants from "expo-constants";
+import PropTypes from "prop-types";
+import Photo from "./Photo";
 
-const width = Dimensions.get('window').width;
-const height = Dimensions.get('window').height;
+const { width } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   container: {
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
-    height: '100%',
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    height: "100%",
   },
   topBar: {
-    alignItems: 'center',
+    alignItems: "center",
     width: "100%",
     height: "13%",
     paddingTop: Constants.statusBarHeight,
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    backgroundColor: "transparent",
+
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
   text: {
     color: "white",
@@ -30,38 +39,40 @@ const styles = StyleSheet.create({
 });
 
 export default class PhotoBrowser extends React.Component {
+  getItemLayout = (data, index) => ({
+    length: height,
+    offset: width * index,
+    index,
+  });
 
-  getItemLayout = (data, index) => (
-    {length: height, offset: width * index, index}
-  )
+  keyExtractor = (item) => item.id || item.thumb || item.photo;
 
-  keyExtractor = item => item.id || item.thumb || item.photo;
+  renderItem = ({ item }) => (
+    <Photo
+      width={width / 3}
+      height={100}
+      resizeMode="cover"
+      thumbnail
+      progressImage={require("./Assets/hourglass.png")}
+      uri={item.thumb || item.photo}
+    />
+  );
 
-  renderItem = ({item}) => {
-    return (
-      <Photo
-        width={width / 3}
-        height={100}
-        resizeMode={'cover'}
-        thumbnail
-        progressImage={require('./Assets/hourglass.png')}
-        uri={item.thumb || item.photo}
-      />
-    );
-  }
-
-  renderTopBar = () =>
+  renderTopBar = () => (
     <View style={styles.topBar}>
       <TouchableOpacity onPress={this.props.onBack}>
-        <MaterialCommunityIcons name="camera-plus" size={32} color="white"/>
+        <MaterialCommunityIcons name="camera-plus" size={32} color="white" />
       </TouchableOpacity>
-      <Text
-        style={styles.text}>{`${this.props.mediaList.length} photo${this.props.mediaList.length > 1 ? 's' : ''}`}
+      <Text style={styles.text}>
+        {`${this.props.mediaList.length} photo${
+          this.props.mediaList.length > 1 ? "s" : ""
+        }`}
       </Text>
       <TouchableOpacity onPress={this.props.toggleModal}>
-        <MaterialCommunityIcons name="dots-horizontal" size={32} color="white"/>
+        <MaterialCommunityIcons name="dots-horizontal" size={32} color="white" />
       </TouchableOpacity>
-    </View>;
+    </View>
+  );
 
   render() {
     return (
@@ -78,5 +89,10 @@ export default class PhotoBrowser extends React.Component {
       </View>
     );
   }
-
 }
+
+PhotoBrowser.propTypes = {
+  onBack: PropTypes.func.isRequired,
+  mediaList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  toggleModal: PropTypes.func.isRequired,
+};

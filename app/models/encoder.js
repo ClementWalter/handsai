@@ -1,18 +1,18 @@
-import { MLModel } from './index';
+import MLModel from "./index";
 
-import getEnvVars from '../environment';
+import getEnvVars from "../environment";
 
-const {apiUrl} = getEnvVars()
+const { apiUrl } = getEnvVars();
 
 class Encoder extends MLModel {
-  url = `${apiUrl}/models/encoder/graph/model.json`
+  url = `${apiUrl}/models/encoder/graph/model.json`;
 
   preprocess = (tensor) => {
     if (tensor.shape.length === 3) {
-      return tensor.expandDims(0)
+      return tensor.expandDims(0);
     }
-    return tensor
-  }
+    return tensor;
+  };
 }
 
-export default new Encoder()
+export default new Encoder();

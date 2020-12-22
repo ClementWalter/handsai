@@ -14,14 +14,12 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "me.handsai.app",
       "buildNumber": "1.1.0",
-      "infoPlist":{
+      "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera to generate a classification model from the images taken by the user",
         "NSPhotoLibraryAddUsageDescription": "The app needs to access the photo library in order to let the user select already taken pictures instead of shooting them"
       }

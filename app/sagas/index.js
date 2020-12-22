@@ -1,10 +1,7 @@
-import { all, fork } from 'redux-saga/effects';
+import { all, fork } from "redux-saga/effects";
 
-import { watchRequestPrediction, watchRequestMediaPrediction } from './predictionSagas';
+import { watchRequestPrediction, watchRequestMediaPrediction } from "./predictionSagas";
 
-export default function* rootSaga () {
-  yield all([
-    fork(watchRequestPrediction),
-    fork(watchRequestMediaPrediction),
-  ]);
+export default function* rootSaga() {
+  yield all([fork(watchRequestPrediction), fork(watchRequestMediaPrediction)]);
 }

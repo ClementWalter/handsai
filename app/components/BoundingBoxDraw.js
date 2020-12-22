@@ -1,21 +1,21 @@
-import React from 'react';
-import * as ExpoPixi from 'expo-pixi'
-import { PIXI } from 'expo-pixi'
-import '@expo/browser-polyfill';
+/* eslint-disable */
+import React from "react";
+import * as ExpoPixi from "expo-pixi";
+import { PIXI } from "expo-pixi";
+import "@expo/browser-polyfill";
 
-import { Dimensions } from 'react-native'
+import { Dimensions } from "react-native";
 
-const width = Dimensions.get('window').width;
-const height = Dimensions.get('window').height;
+const { width } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
 export default class BoundingBoxDraw extends React.Component {
-
   onChange = async () => {
     const boundingBox = this.computeBoundingBox();
     const points = this.boundingBoxToPoints(boundingBox);
-    this.drawRect(points)
+    this.drawRect(points);
     this.sketch.renderer._update();
-    this.props.handleBoundingBoxChange(boundingBox)
+    this.props.handleBoundingBoxChange(boundingBox);
   };
 
   drawRect = (points) => {
@@ -24,7 +24,7 @@ export default class BoundingBoxDraw extends React.Component {
     this.sketch.stage.addChild(graphics);
     graphics.clear();
     for (let i = 0; i < points.length; i++) {
-      const {x, y, color, width, alpha} = points[i];
+      const { x, y, color, width, alpha } = points[i];
       if (i === 0) {
         graphics.lineStyle(width, color, alpha);
         graphics.moveTo(x, y);
@@ -33,40 +33,41 @@ export default class BoundingBoxDraw extends React.Component {
       }
     }
     graphics.endFill();
-  }
+  };
 
   computeBoundingBox = () => {
-    const x_coordinates = this.sketch.points.map((point) => point.x)
-    const y_coordinates = this.sketch.points.map((point) => point.y)
+    const x_coordinates = this.sketch.points.map((point) => point.x);
+    const y_coordinates = this.sketch.points.map((point) => point.y);
     return {
-      x1: x_coordinates.reduce((x, prev) => x < prev ? x : prev),
-      x2: x_coordinates.reduce((x, prev) => x > prev ? x : prev),
-      y1: y_coordinates.reduce((y, prev) => y < prev ? y : prev),
-      y2: y_coordinates.reduce((y, prev) => y > prev ? y : prev),
-    }
-  }
+      x1: x_coordinates.reduce((x, prev) => (x < prev ? x : prev)),
+      x2: x_coordinates.reduce((x, prev) => (x > prev ? x : prev)),
+      y1: y_coordinates.reduce((y, prev) => (y < prev ? y : prev)),
+      y2: y_coordinates.reduce((y, prev) => (y > prev ? y : prev)),
+    };
+  };
 
   boundingBoxToPoints = (boundingBox) => {
-    const {x1, y1, x2, y2} = boundingBox
+    const { x1, y1, x2, y2 } = boundingBox;
     return [
-      {x: x1, y: y1, color: "black", width: 10, alpha: 1},
-      {x: x1, y: y2, color: "black", width: 10, alpha: 1},
-      {x: x2, y: y2, color: "black", width: 10, alpha: 1},
-      {x: x2, y: y1, color: "black", width: 10, alpha: 1},
-      {x: x1, y: y1, color: "black", width: 10, alpha: 1},
-    ]
-  }
+      { x: x1, y: y1, color: "black", width: 10, alpha: 1 },
+      { x: x1, y: y2, color: "black", width: 10, alpha: 1 },
+      { x: x2, y: y2, color: "black", width: 10, alpha: 1 },
+      { x: x2, y: y1, color: "black", width: 10, alpha: 1 },
+      { x: x1, y: y1, color: "black", width: 10, alpha: 1 },
+    ];
+  };
 
   render() {
-    return <ExpoPixi.Sketch
-      strokeColor="black"
-      strokeWidth={10}
-      strokeAlpha={1}
-      ref={ref => (this.sketch = ref)}
-      onChange={this.onChange}
-      transparent={true}
-      style={{flex: 1, height, width, ...this.props.style}}
-    />
+    return (
+      <ExpoPixi.Sketch
+        strokeColor="black"
+        strokeWidth={10}
+        strokeAlpha={1}
+        ref={(ref) => (this.sketch = ref)}
+        onChange={this.onChange}
+        transparent
+        style={{ flex: 1, height, width, ...this.props.style }}
+      />
+    );
   }
-
 }

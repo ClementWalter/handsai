@@ -1,11 +1,11 @@
-import { MLModel } from './index';
+import MLModel from "./index";
 
-import getEnvVars from '../environment';
+import getEnvVars from "../environment";
 
-const { apiUrl } = getEnvVars()
+const { apiUrl } = getEnvVars();
 
 class Kernel extends MLModel {
-  url = `${apiUrl}/models/kernel/graph/model.json`
+  url = `${apiUrl}/models/kernel/graph/model.json`;
 }
 
-export default new Kernel()
+export default new Kernel();
