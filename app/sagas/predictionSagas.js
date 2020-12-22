@@ -43,7 +43,7 @@ export function* watchRequestPrediction() {
 }
 
 function* requestMediaPrediction(action) {
-  const tensors = yield Promise.all(action.media.map((asset) => loadUri(asset.localUri)))
+  const tensors = yield Promise.all(action.media.map((asset) => loadUri(asset.uri)))
   const compressed = yield Promise.all(tensors.map((tensor) => compressJpeg(tensor, 10)))
   const embeddings = yield encoder.predict(preprocessing.predict(tf.stack(compressed)))
   const supportSet = action.media.map((asset, index) => (

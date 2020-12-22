@@ -2,18 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import PhotoBrowser from "./PhotoBrowser";
-import { StyleSheet, View, YellowBox } from 'react-native'
+import { Alert, StyleSheet, View } from 'react-native'
 import * as MediaLibrary from 'expo-media-library';
 import * as Permissions from 'expo-permissions';
 import Modal from 'react-native-modal';
 import ModalContent from './ModalContent';
 import { clearSupportSet } from '../actions/supportSetActions';
 import { requestMediaPrediction } from '../actions/predictionActions'
-
-YellowBox.ignoreWarnings([ // TODO: Remove when fixed
-  'VirtualizedLists should never be nested',
-  'Animated: `useNativeDriver` was not specified',
-])
+import * as ImageManipulator from 'expo-image-manipulator';
 
 const styles = StyleSheet.create({
   container: {
@@ -72,8 +68,20 @@ class GalleryScreen extends React.Component {
     }
   }
 
+  alertNoAlbum = () => Alert.alert(
+    "No media found in albums",
+    "You may want to add them from your camera roll app",
+    [
+      {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+    ],
+    {cancelable: false},
+  );
+
   loadSupportSet = async () => {
-    this.toggleModal()
     const albums = await MediaLibrary.getAlbumsAsync()
     const albumsAssets = await Promise.all(albums.map((album) => MediaLibrary.getAssetsAsync({album})))
     const media = albumsAssets.map((albumAssets, index) => albumAssets.assets.map((x) => (
@@ -82,8 +90,22 @@ class GalleryScreen extends React.Component {
         label: albums[index].title,
       }
     ))).flat()
-    const mediaWithInfo = await Promise.all(media.map((asset) => MediaLibrary.getAssetInfoAsync(asset)))
-    await this.props.requestMediaPrediction(mediaWithInfo)
+    if ( media.length === 0 ) {
+      await this.alertNoAlbum()
+    }
+    else {
+    this.toggleModal()
+      const assetInfos = await Promise.all(
+        media.map((asset) => MediaLibrary.getAssetInfoAsync(asset)),
+      )
+      const jpegs = await Promise.all(
+        assetInfos.map((asset) => ImageManipulator.manipulateAsync(asset.localUri, [{resize: {width: 224}}], {compress: 0.1})),
+      )
+      const mediaWithInfo = media.map((asset, index) => (
+        {...asset, ...jpegs[index]}
+      ))
+      await this.props.requestMediaPrediction(mediaWithInfo)
+    }
   }
 
   clearSupportSet = () => {
