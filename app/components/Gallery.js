@@ -88,6 +88,7 @@ class GalleryScreen extends React.Component {
         {
           text: "Cancel",
           style: "cancel",
+          onPress: () => this.toggleModal(),
         },
       ],
       { cancelable: false }
