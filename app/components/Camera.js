@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
-import { EvilIcons, Ionicons, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { EvilIcons, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
 import { connect } from 'react-redux';

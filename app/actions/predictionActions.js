@@ -20,3 +20,8 @@ export const requestPrediction = (tensor, supportSet, photo) => ({
   supportSet,
   photo,
 })
+
+export const requestMediaPrediction = (media) => ({
+  type: 'REQUEST_MEDIA_PREDICTION',
+  media,
+})

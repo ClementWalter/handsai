@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, StyleSheet, View } from 'react-native';
 
-class DefaultModalContent extends React.Component {
+class ModalContent extends React.Component {
 
   render() {
     return (
@@ -18,7 +18,6 @@ const styles = StyleSheet.create({
     padding: 22,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 4,
     borderColor: 'rgba(0, 0, 0, 0.1)',
   },
   contentTitle: {
@@ -27,4 +26,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DefaultModalContent;
+export default ModalContent;

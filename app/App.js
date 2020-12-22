@@ -44,7 +44,7 @@ export default class App extends React.Component {
               <HomeScreen swiper={this.scrollBy(1)}/>
             </View>
             <View style={styles.container}>
-              <Gallery swiper={this.scrollBy(0)}/>
+              <Gallery swiper={this.scrollBy(-1)}/>
             </View>
           </Swiper>
         </Provider>
@@ -90,6 +90,6 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#6E00FF',
+    backgroundColor: '#000000',
   },
 });

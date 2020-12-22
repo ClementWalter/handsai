@@ -1,6 +1,6 @@
 const ENV = {
  dev: {
-   apiUrl: "http://192.168.1.11:5000/api",
+   apiUrl: "http://192.168.1.18:5000/api",
    // apiUrl: "http://172.16.1.74:5000/api",
  },
  prod: {

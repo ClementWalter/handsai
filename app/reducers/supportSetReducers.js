@@ -8,6 +8,17 @@ const supportSetReducers = (state = initialState, action) => {
         ...action.prediction.predictions,
       ];
     }
+    case 'LOAD_SUPPORT_SET': {
+      return [
+        ...state,
+        ...action.supportSet
+      ]
+    }
+    case 'CLEAR_SUPPORT_SET': {
+      return [
+        ...initialState
+      ]
+    }
     default: {
       return state;
     }
