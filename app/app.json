@@ -2,7 +2,7 @@
   "expo": {
     "name": "handsai",
     "slug": "handsai",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -18,7 +18,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "me.handsai.app",
-      "buildNumber": "1.1.0",
+      "buildNumber": "1.1.1",
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera to generate a classification model from the images taken by the user",
         "NSPhotoLibraryAddUsageDescription": "The app needs to access the photo library in order to let the user select already taken pictures instead of shooting them"
