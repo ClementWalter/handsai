@@ -6,6 +6,7 @@ import preprocessing from "../models/preprocessing";
 import encoder from "../models/encoder";
 import kernel from "../models/kernel";
 import { loadSupportSet } from "../actions/supportSetActions";
+import { toggleLoader } from "../actions/galleryActions";
 
 const predict = (tensor, supportSet) => {
   const embedding = encoder.predict(preprocessing.predict(tensor));
@@ -43,12 +44,16 @@ export function* watchRequestPrediction() {
 function* requestMediaPrediction(action) {
   const tensors = yield Promise.all(action.media.map((asset) => loadUri(asset.uri)));
   const compressed = yield Promise.all(tensors.map((tensor) => compressJpeg(tensor, 10)));
-  const embeddings = yield encoder.predict(preprocessing.predict(tf.stack(compressed)));
+  const preprocessed = yield Promise.all(
+    compressed.map((tensor) => preprocessing.predict(tensor))
+  );
+  const embeddings = yield encoder.predict(tf.stack(preprocessed));
   const supportSet = action.media.map((asset, index) => ({
     ...asset,
     embedding: embeddings.gather(tf.tensor1d([index], "int32")),
   }));
   yield put(loadSupportSet(supportSet));
+  yield put(toggleLoader());
 }
 
 export function* watchRequestMediaPrediction() {

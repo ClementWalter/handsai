@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { Alert, StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View, ActivityIndicator } from "react-native";
 import * as MediaLibrary from "expo-media-library";
 import * as Permissions from "expo-permissions";
 import Modal from "react-native-modal";
@@ -10,6 +10,7 @@ import ModalContent from "./ModalContent";
 import { clearSupportSet } from "../actions/supportSetActions";
 import { requestMediaPrediction } from "../actions/predictionActions";
 import PhotoBrowser from "./PhotoBrowser";
+import { toggleLoader } from "../actions/galleryActions";
 
 const styles = StyleSheet.create({
   container: {
@@ -18,6 +19,15 @@ const styles = StyleSheet.create({
   modal: {
     justifyContent: "flex-end",
     margin: 0,
+  },
+  loading: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 
@@ -80,7 +90,7 @@ class GalleryScreen extends React.Component {
     );
   };
 
-  alertNoAlbum = () =>
+  alertNoAlbum = (callback) =>
     Alert.alert(
       "No media found in albums",
       "You may want to add them from your camera roll app",
@@ -88,16 +98,32 @@ class GalleryScreen extends React.Component {
         {
           text: "Cancel",
           style: "cancel",
-          onPress: () => this.toggleModal(),
+          onPress: callback,
         },
       ],
-      { cancelable: false }
+      { cancelable: false, onDismiss: callback }
+    );
+
+  alertTooManyAssets = (callback) =>
+    Alert.alert(
+      "Some albums will not be loaded entirely",
+      `Only the first ${this.props.pageSize} pictures of an album are kept`,
+      [
+        {
+          text: "Ok",
+          onPress: callback,
+        },
+      ],
+      { cancelable: false, onDismiss: callback }
     );
 
   loadSupportSet = async () => {
+    this.props.toggleLoader();
     const albums = await MediaLibrary.getAlbumsAsync();
     const albumsAssets = await Promise.all(
-      albums.map((album) => MediaLibrary.getAssetsAsync({ album }))
+      albums.map((album) =>
+        MediaLibrary.getAssetsAsync({ first: this.props.pageSize, album })
+      )
     );
     const media = albumsAssets
       .map((albumAssets, index) =>
@@ -108,8 +134,13 @@ class GalleryScreen extends React.Component {
       )
       .flat();
     if (media.length === 0) {
-      await this.alertNoAlbum();
+      this.props.toggleLoader();
+      await new Promise((resolve) => this.alertNoAlbum(resolve));
+      this.toggleModal();
     } else {
+      if (albumsAssets.filter((albumAssets) => albumAssets.hasNextPage).length > 0) {
+        await new Promise((resolve) => this.alertTooManyAssets(resolve));
+      }
       this.toggleModal();
       const assetInfos = await Promise.all(
         media.map((asset) => MediaLibrary.getAssetInfoAsync(asset))
@@ -125,7 +156,7 @@ class GalleryScreen extends React.Component {
         ...asset,
         ...jpegs[index],
       }));
-      await this.props.requestMediaPrediction(mediaWithInfo);
+      this.props.requestMediaPrediction(mediaWithInfo);
     }
   };
 
@@ -165,6 +196,9 @@ class GalleryScreen extends React.Component {
           <ModalContent onPress={this.loadSupportSet} text="Load from camera roll" />
           <ModalContent onPress={this.clearSupportSet} text="Clear" />
         </Modal>
+        {this.props.isLoading && (
+          <ActivityIndicator style={styles.loading} size="large" />
+        )}
       </View>
     );
   }
@@ -175,14 +209,23 @@ GalleryScreen.propTypes = {
   requestMediaPrediction: PropTypes.func.isRequired,
   clearSupportSet: PropTypes.func.isRequired,
   swiper: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool.isRequired,
+  toggleLoader: PropTypes.func.isRequired,
+  pageSize: PropTypes.number,
+};
+
+GalleryScreen.defaultProps = {
+  pageSize: 30,
 };
 
 const mapStateToProps = (state) => ({
   supportSet: state.supportSet,
+  isLoading: state.gallery.isLoading,
 });
 const mapDispatchToProps = (dispatch) => ({
   requestMediaPrediction: (media) => dispatch(requestMediaPrediction(media)),
   clearSupportSet: () => dispatch(clearSupportSet()),
+  toggleLoader: () => dispatch(toggleLoader()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(GalleryScreen);
