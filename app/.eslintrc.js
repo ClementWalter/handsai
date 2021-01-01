@@ -12,7 +12,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: "module",
   },
-  plugins: ["react", "react-native"],
+  plugins: ["react", "react-native", "react-hooks"],
   rules: {
     "linebreak-style": ["error", "unix"],
     quotes: ["error", "double"],
@@ -27,5 +27,11 @@ module.exports = {
     "global-require": "off",
   },
   ignorePatterns: ["babel.config.js"],
-  extends: ["plugin:react/recommended", "airbnb", "prettier", "prettier/react"],
+  extends: [
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "airbnb",
+    "prettier",
+    "prettier/react",
+  ],
 };
