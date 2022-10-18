@@ -1,15 +1,13 @@
 import React from "react";
-import tw from "twin.macro";
 import styled from "styled-components";
-import { css } from "styled-components/macro"; //eslint-disable-line
+import tw from "twin.macro";
 
 import Header, {
-  NavLink,
-  NavLinks,
-  PrimaryLink as PrimaryLinkBase,
-  LogoLink,
-  NavToggle,
   DesktopNavLinks,
+  LogoLink,
+  NavLink,
+  NavToggle,
+  PrimaryLink as PrimaryLinkBase,
 } from "../headers/light.js";
 
 const StyledHeader = styled(Header)`
@@ -22,7 +20,9 @@ const StyledHeader = styled(Header)`
   }
 `;
 
-const PrimaryLink = tw(PrimaryLinkBase)`rounded-full px-8 py-3 mt-10 text-sm sm:text-base sm:mt-16 sm:px-8 sm:py-4 bg-gray-100 font-bold shadow transition duration-300 bg-primary-500 text-gray-100 hocus:bg-primary-700 hocus:text-gray-200 focus:outline-none focus:shadow-outline`;
+const PrimaryLink = tw(
+  PrimaryLinkBase
+)`rounded-full px-8 py-3 mt-10 text-sm sm:text-base sm:mt-16 sm:px-8 sm:py-4 bg-gray-100 font-bold shadow transition duration-300 bg-primary-500 text-gray-100 hocus:bg-primary-700 hocus:text-gray-200 focus:outline-none focus:shadow-outline`;
 const Container = styled.div`
   ${tw`relative -mx-8 -mt-8 bg-center bg-cover h-screen min-h-144`}
   background-image: url("https://source.unsplash.com/rWMIbqmOxrY/1600x900");
@@ -44,41 +44,24 @@ const Heading = styled.h1`
 `;
 
 export default () => {
-  const navLinks = [
-    // <NavLinks key={1}>
-    //   <NavLink href="#">
-    //     About
-    //   </NavLink>
-    //   <NavLink href="#">
-    //     Blog
-    //   </NavLink>
-    //   <NavLink href="#">
-    //     Locations
-    //   </NavLink>
-    //   <NavLink href="#">
-    //     Pricing
-    //   </NavLink>
-    // </NavLinks>,
-    // <NavLinks key={2}>
-    //   <PrimaryLink href="/#">
-    //     Hire Us
-    //   </PrimaryLink>
-    // </NavLinks>
-  ];
+  const navLinks = [];
 
   return (
     <Container>
-      <OpacityOverlay/>
+      <OpacityOverlay />
       <HeroContainer>
-        <StyledHeader links={navLinks}/>
+        <StyledHeader links={navLinks} />
         <Content>
           <Heading>
             Your products, <span tw="text-primary-500">your AI.</span>
             <p>
-              Build and test your computer vision models with your smartphone, in minutes
+              Build and test your computer vision models with your smartphone,
+              in minutes
             </p>
           </Heading>
-          <PrimaryLink href="/contact">Request demo</PrimaryLink>
+          <PrimaryLink href="mailto:clement0walter@gmail.com">
+            Request demo
+          </PrimaryLink>
         </Content>
       </HeroContainer>
     </Container>
